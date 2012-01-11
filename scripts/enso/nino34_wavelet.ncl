@@ -31,7 +31,6 @@ begin
     f = addfile(file_name, "r")
 
     dates = ut_calendar(f->time, -2)/100
-    printVarSummary(YM)
 
     i = ind(dates .eq. start_date)
     j = ind(dates .eq. end_date)
@@ -43,18 +42,18 @@ begin
     ssta = rmMonAnnCycTLL(sst)
     sstlonave = dim_avg_n_Wrap(ssta(:,{-5:5},{190:240}),2)
     nino34 = dim_avg_n_Wrap(sstlonave(:,{-5:5}),1)
-    time = fspan(start_year,end_year,ntimes)
+    time = fspan(start_year, end_year, num_time)
 
     ; --------------------------------------------------------------------------
     ; calculate wavelet
-    N = ntimes
+    N = num_time
     mother   = 0
     param    = 6.0
     dt       = 0.25
     s0       = dt
     dj       = 0.25
     jtot     = 1+floattointeger(((log10(N*dt/s0))/dj)/log10(2.))
-    npad     = tointeger( (tointeger(ntimes^0.5)+1)^2)
+    npad     = tointeger((tointeger(num_time^0.5)+1)^2)
     nadof    = 0
     noise    = 1
     siglvl   = 0.05
@@ -73,7 +72,7 @@ begin
 
     ; --------------------------------------------------------------------------
     ; draw wavelet plot
-    wks = gsn_open_wks("pdf","wavelet")
+    wks = gsn_open_wks("pdf","nino34_wavelet")
 
     gsn_define_colormap(wks, "wh-bl-gr-ye-re")
 
@@ -93,12 +92,12 @@ begin
     res@tmYLMode             = "Explicit"
     res@tmXBMode             = "Explicit"
     res@tmYLValues           = (/1,2,3,4,5,8,10/)
+    ; TODO: Change the fixed year range.
     res@tmXBValues           = ispan(1874, 2004, 10)
     res@tmXBMinorOn          = True
-    res@tmXBMinorValues      = ispan(1870,2006,1)
+    res@tmXBMinorValues      = ispan(start_year, end_year, 1)
     res@tmYLLabels           = (/"1","2","3","4","5","8","10"/)
     res@tmXBLabels           = tostring(ispan(1874,2004,10))
-    res@tmYLDataBottomF      = 10
     res@tmYLLabelFontHeightF = 0.01
     res@tmXBLabelFontHeightF = 0.01
     res@tmLabelAutoStride    = True
@@ -108,6 +107,7 @@ begin
     res@cnLevelSelectionMode = "ExplicitLevels"
     res@cnLevels             = ispan(0, 75, 5)
     res@lbLabelFontHeightF   = 0.015
+    res@lbOrientation        = "Vertical"
   
     power&period             = power&period/12.0/dt
     plot = gsn_csm_contour(wks, power({0.5:11.7},:), res)
