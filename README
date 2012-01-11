@@ -3,15 +3,15 @@
 --------------------------------------------------------------------------------
 Description:
 
-	This is a collaborative repository, enclosing scripts (e.g., NCL) and tools
-	to process and diagnose the climate model data.
+    This is a collaborative repository, enclosing scripts (e.g., NCL) and tools
+    to process and diagnose the climate model data.
 
-	More cotents will come soon!
+    More cotents will come soon!
 --------------------------------------------------------------------------------
 Framework:
 
-	Scripts will be organized according to phenomena in atmosphere, ocean, etc.
+    Scripts will be organized according to phenomena in atmosphere, ocean, etc.
 
-	Tools will contain any program code to process or prepare data for next
-	diagnostics.
+    Tools will contain any program code to process or prepare data for next
+    diagnostics.
 --------------------------------------------------------------------------------
