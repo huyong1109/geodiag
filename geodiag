@@ -1,0 +1,21 @@
+#!/bin/bash
+# ------------------------------------------------------------------------------
+# Description:
+#
+#   This is the driver for the individual script or tool.
+#
+# Authors:
+#
+#   Li Dong
+# ------------------------------------------------------------------------------
+
+# source the driver for each phenomenon
+for driver in $(find scripts -name "driver.sh"); do
+    source $driver
+done
+
+echo "[Notice]: Which phenomenon do you want to diagnose?"
+read -p "[phenomenon] > " phenon
+
+# call corresponding driver
+${phenon}_driver
