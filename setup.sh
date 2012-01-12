@@ -11,3 +11,4 @@
 # ------------------------------------------------------------------------------
 
 export GEODIAG_ROOT=$(dirname $BASH_ARGV)
+export PATH=$PATH:$GEODIAG_ROOT

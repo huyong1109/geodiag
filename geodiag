@@ -10,7 +10,7 @@
 # ------------------------------------------------------------------------------
 
 # source the driver for each phenomenon
-for driver in $(find scripts -name "driver.sh"); do
+for driver in $(find $GEODIAG_ROOT/scripts -name "driver.sh"); do
     source $driver
 done
 
