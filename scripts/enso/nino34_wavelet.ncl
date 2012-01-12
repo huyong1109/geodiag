@@ -2,47 +2,73 @@ load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_code.ncl"
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_csm.ncl"
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/contributed.ncl"
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/shea_util.ncl"
+load "$GEODIAG_ROOT/scripts/utils/geodiag_ncl_utils.ncl"
 
 ; ------------------------------------------------------------------------------
 ; Drescription:
 ;
 ;   This script is used to draw the wavelet analysis of SST at NINO3.4 region.
+;
+; Input:
+;
+;   Monthly SST temporal series.
+;
+; Authors:
+;
+;   - originally created by Lijuan Li
+;   - modified by Ning Hu
+;   - standardized by Li Dong
 ; ------------------------------------------------------------------------------
 
 begin
 
     if (.not. isdefined("start_date")) then
-        system("echo [Error]: Start year is not provided!")
-        exit
+        report_error("Start year is not provided!")
     end if
     if (.not. isdefined("end_date")) then
-        system("echo [Error]: End year is not provided!")
-        exit
+        report_error("End year is not provided!")
     end if
     if (.not. isdefined("file_name")) then
-        system("echo [Error]: SST data file is not provided!")
-        exit
+        report_error("SST data file is not provided!")
     end if
 
     start_year = start_date/100
     end_year = end_date/100
     num_time = 12*(end_year-start_year+1)
+    years = fspan(start_year, end_year, num_time)
 
     f = addfile(file_name, "r")
 
+    if (.not. isatt(f, "time")) then
+        report_error("There is no ""time"" variable in """+file_name+"""!")
+    end if
     dates = ut_calendar(f->time, -2)/100
 
     i = ind(dates .eq. start_date)
     j = ind(dates .eq. end_date)
 
-    sst = f->ts(i:j,0,:,:)
+    ; get SST variable
+    var_names = get_file_vars(file_name)
+    if (dimsizes(var_names) .ne. 1) then
+        report_error("There are more than 1 variable in """+file_name+"""!")
+    end if
+    if (dimsizes(f->$var_names(0)$) .eq. 4) then
+        sst = f->$var_names(0)$(i:j,0,:,:)
+    end if
+    if (dimsizes(f->$var_names(0)$) .eq. 3) then
+        sst = f->$var_names(0)$(i:j,:,:)
+    end if
+    if (.not. isdefined("sst")) then
+        report_error("Unknown dimensions of """+var_names(0)+"""!")
+    end if
 
     ; --------------------------------------------------------------------------
     ; calculate nino34 index
+    lon_idx = select_region_lon("nino34", f->lon)
+    lat_idx = select_region_lat("nino34", f->lat)
     ssta = rmMonAnnCycTLL(sst)
-    sstlonave = dim_avg_n_Wrap(ssta(:,{-5:5},{190:240}),2)
-    nino34 = dim_avg_n_Wrap(sstlonave(:,{-5:5}),1)
-    time = fspan(start_year, end_year, num_time)
+    sstlonave = dim_avg_n_Wrap(ssta(:,lat_idx,lon_idx), 2)
+    nino34 = dim_avg_n_Wrap(sstlonave(:,lat_idx), 1)
 
     ; --------------------------------------------------------------------------
     ; calculate wavelet
@@ -58,21 +84,22 @@ begin
     noise    = 1
     siglvl   = 0.05
     isigtest = 0
-    w        = wavelet(nino34, mother, dt, param, s0, dj, jtot, npad, \
+    result   = wavelet(nino34, mother, dt, param, s0, dj, jtot, npad, \
                        noise, isigtest, siglvl, nadof)
-    power    = onedtond(w@power,(/jtot,N/))
-    power!0          = "period"                        ; Y axis
-    power&period     = w@period
-    power!1          = "time"                          ; X axis
-    power&time       = time
-    SIG              = power                            ; transfer meta data
-    SIG              = power/conform (power,w@signif,0)
-    SIG@long_name    = "Significance"
-    SIG@units        = " "
+    power         = onedtond(result@power, (/jtot,N/))
+    power!0       = "period"
+    power&period  = result@period
+    power!1       = "time"
+    power&time    = years
+    ; TODO: Clarify the significance.
+    sig           = power
+    sig           = power/conform(power, result@signif, 0)
+    sig@long_name = "Significance"
+    sig@units     = " "
 
     ; --------------------------------------------------------------------------
     ; draw wavelet plot
-    wks = gsn_open_wks("pdf","nino34_wavelet")
+    wks = gsn_open_wks("pdf", "nino34_wavelet")
 
     gsn_define_colormap(wks, "wh-bl-gr-ye-re")
 
@@ -115,22 +142,22 @@ begin
 
     ; -------------------------------------------------------------------------
     ; draw reference line
-    plx = (/min(time),max(time)/)
+    x = (/min(time),max(time)/)
 
-    yvalues = (/2,3,4,5/)
-    nvalues = dimsizes(yvalues)
-
-    dum = new(nvalues, graphic)
+    refer_periods = (/2,3,4,5/)
+    dum = new(dimsizes(refer_periods), graphic)
 
     res = True
-    do i=0,nvalues-1
-        res@gsLineDashPattern = 2
-        res@gsLineColor       = "blue"
-        ply = (/yvalues(i),yvalues(i)/)
-        dum(i) = gsn_add_polyline(wks, plot, plx, ply, res)
+    res@gsLineDashPattern = 2
+    res@gsLineColor       = "blue"
+    do i = 0, dimsizes(refer_period)-1
+        y = (/refer_periods(i),refer_periods(i)/)
+        dum(i) = gsn_add_polyline(wks, plot, x, y, res)
     end do
 
     draw(plot)
     frame(wks)
+
+    notice("Figure ""nino34_wavelet.pdf"" is generated!")
 
 end
