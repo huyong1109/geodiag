@@ -289,6 +289,8 @@ function select_region_lat(region:string, lat[*]:numeric)
 local min_lon, max_lon, min_lat, max_lat, min_j, max_j, j, lat_bnds
 begin
 
+    option = isMonotonic(lat)
+
     ; --------------------------------------------------------------------------
     num_lat = dimsizes(lat)
     lat_bnds = new((/num_lat,2/), typeof(lat))
@@ -310,26 +312,51 @@ begin
     max_j = -1
 
     ; --------------------------------------------------------------------------
-    min_lat = max((/min_lat,lat_bnds(0,0)/))
-    min_lat = min((/min_lat,lat_bnds(num_lat-1,1)/))
-    max_lat = min((/max_lat,lat_bnds(num_lat-1,1)/))
-    max_lat = max((/max_lat,lat_bnds(0,0)/))
+    if (option .eq. 1) then
+        min_lat = max((/min_lat,lat_bnds(0,0)/))
+        min_lat = min((/min_lat,lat_bnds(num_lat-1,1)/))
+        max_lat = min((/max_lat,lat_bnds(num_lat-1,1)/))
+        max_lat = max((/max_lat,lat_bnds(0,0)/))
+    else
+        min_lat = max((/min_lat,lat_bnds(num_lat-1,1)/))
+        min_lat = min((/min_lat,lat_bnds(0,0)/))
+        max_lat = min((/max_lat,lat_bnds(0,0)/))
+        max_lat = max((/max_lat,lat_bnds(num_lat-1,1)/))
+    end if
 
     ; --------------------------------------------------------------------------
-    do j = 0, num_lat-1
-        if (min_lat .ge. lat_bnds(j,0) .and. min_lat .lt. lat_bnds(j,1)) then
-            min_j = j
-            break
-        end if
-    end do
+    if (option .eq. 1) then
+        do j = 0, num_lat-1
+            if (min_lat .ge. lat_bnds(j,0) .and. min_lat .lt. lat_bnds(j,1)) then
+                min_j = j
+                break
+            end if
+        end do
+    else
+        do j = 0, num_lat-1
+            if (max_lat .le. lat_bnds(j,0) .and. max_lat .gt. lat_bnds(j,1)) then
+                min_j = j
+                break
+            end if
+        end do
+    end if
     min_j = max((/0,min_j/))
 
-    do j = 0, num_lat-1
-        if (max_lat .ge. lat_bnds(j,0) .and. max_lat .lt. lat_bnds(j,1)) then
-            max_j = j
-            break
-        end if
-    end do
+    if (option .eq. 1) then
+        do j = 0, num_lat-1
+            if (max_lat .gt. lat_bnds(j,0) .and. max_lat .le. lat_bnds(j,1)) then
+                max_j = j
+                break
+            end if
+        end do
+    else
+        do j = 0, num_lat-1
+            if (min_lat .lt. lat_bnds(j,0) .and. min_lat .ge. lat_bnds(j,1)) then
+                max_j = j
+                break
+            end if
+        end do
+    end if
     if (max_j .eq. -1) then
         max_j = num_lat-1
     end if

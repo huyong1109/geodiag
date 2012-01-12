@@ -23,10 +23,10 @@ load "$GEODIAG_ROOT/scripts/utils/geodiag_ncl_utils.ncl"
 begin
 
     if (.not. isdefined("start_date")) then
-        report_error("Start year is not provided!")
+        report_error("Start date is not provided with form YYYYMM!")
     end if
     if (.not. isdefined("end_date")) then
-        report_error("End year is not provided!")
+        report_error("End date is not provided with form YYYYMM!")
     end if
     if (.not. isdefined("file_name")) then
         report_error("SST data file is not provided!")
@@ -39,8 +39,8 @@ begin
 
     f = addfile(file_name, "r")
 
-    if (.not. isatt(f, "time")) then
-        report_error("There is no ""time"" variable in """+file_name+"""!")
+    if (.not. isfilevar(f, "time")) then
+        report_error("There is no time variable in "+file_name+"!")
     end if
     dates = ut_calendar(f->time, -2)/100
 
@@ -50,16 +50,16 @@ begin
     ; get SST variable
     var_names = get_file_vars(file_name)
     if (dimsizes(var_names) .ne. 1) then
-        report_error("There are more than 1 variable in """+file_name+"""!")
+        report_error("There are more than 1 variable in "+file_name+"!")
     end if
-    if (dimsizes(f->$var_names(0)$) .eq. 4) then
+    if (dimsizes(dimsizes(f->$var_names(0)$)) .eq. 4) then
         sst = f->$var_names(0)$(i:j,0,:,:)
     end if
-    if (dimsizes(f->$var_names(0)$) .eq. 3) then
+    if (dimsizes(dimsizes(f->$var_names(0)$)) .eq. 3) then
         sst = f->$var_names(0)$(i:j,:,:)
     end if
     if (.not. isdefined("sst")) then
-        report_error("Unknown dimensions of """+var_names(0)+"""!")
+        report_error("Unknown dimensions of "+var_names(0)+"!")
     end if
 
     ; --------------------------------------------------------------------------
@@ -68,7 +68,7 @@ begin
     lat_idx = select_region_lat("nino34", f->lat)
     ssta = rmMonAnnCycTLL(sst)
     sstlonave = dim_avg_n_Wrap(ssta(:,lat_idx,lon_idx), 2)
-    nino34 = dim_avg_n_Wrap(sstlonave(:,lat_idx), 1)
+    nino34 = dim_avg_n_Wrap(sstlonave(:,:), 1)
 
     ; --------------------------------------------------------------------------
     ; calculate wavelet
@@ -106,6 +106,7 @@ begin
     res                      = True
     res@tiXAxisString        = "Year"
     res@tiYAxisString        = "Period"
+    res@gsnMaximize          = True
     res@gsnDraw              = False
     res@gsnFrame             = False
     res@cnFillOn             = True
@@ -119,12 +120,11 @@ begin
     res@tmYLMode             = "Explicit"
     res@tmXBMode             = "Explicit"
     res@tmYLValues           = (/1,2,3,4,5,8,10/)
-    ; TODO: Change the fixed year range.
-    res@tmXBValues           = ispan(1874, 2004, 10)
+    res@tmXBValues           = ispan(start_year, end_year, 10)
     res@tmXBMinorOn          = True
     res@tmXBMinorValues      = ispan(start_year, end_year, 1)
     res@tmYLLabels           = (/"1","2","3","4","5","8","10"/)
-    res@tmXBLabels           = tostring(ispan(1874,2004,10))
+    res@tmXBLabels           = tostring(ispan(start_year, end_year, 10))
     res@tmYLLabelFontHeightF = 0.01
     res@tmXBLabelFontHeightF = 0.01
     res@tmLabelAutoStride    = True
@@ -135,14 +135,16 @@ begin
     res@cnLevels             = ispan(0, 75, 5)
     res@lbLabelFontHeightF   = 0.015
     res@lbOrientation        = "Vertical"
-  
+    res@lbBoxMinorExtentF    = 0.1
+    res@pmLabelBarOrthogonalPosF = -0.05
+
     power&period             = power&period/12.0/dt
     plot = gsn_csm_contour(wks, power({0.5:11.7},:), res)
     delete(res)
 
     ; -------------------------------------------------------------------------
     ; draw reference line
-    x = (/min(time),max(time)/)
+    x = (/min(years),max(years)/)
 
     refer_periods = (/2,3,4,5/)
     dum = new(dimsizes(refer_periods), graphic)
@@ -150,7 +152,7 @@ begin
     res = True
     res@gsLineDashPattern = 2
     res@gsLineColor       = "blue"
-    do i = 0, dimsizes(refer_period)-1
+    do i = 0, dimsizes(refer_periods)-1
         y = (/refer_periods(i),refer_periods(i)/)
         dum(i) = gsn_add_polyline(wks, plot, x, y, res)
     end do
@@ -158,6 +160,6 @@ begin
     draw(plot)
     frame(wks)
 
-    notice("Figure ""nino34_wavelet.pdf"" is generated!")
+    notice("Figure nino34_wavelet.pdf is generated!")
 
 end
