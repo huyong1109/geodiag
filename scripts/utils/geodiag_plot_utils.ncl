@@ -390,6 +390,7 @@ begin
     ; ------------------------------------------------------------------------
     ; draw base map
     res1                        = True
+    res1@gsnMaximize            = True
     ;res1@gsnDraw                = False
     res1@gsnFrame               = False
     res1@mpMinLatF              = 17.
@@ -418,7 +419,8 @@ begin
     ; draw china map from shapefile directly which is downloaded from:
     ;   National Fundamental Geographic Information System
     ;   http://nfgis.nsdi.gov.cn/nfgis/english/default.htm
-    f = addfile("map/bou1_4l.shp", "r")
+    shapefile = systemfunc("echo $GEODIAG_ROOT/scripts/utils/map/bou1_4l.shp")
+    f = addfile(shapefile, "r")
 
     segments = f->segments
     geometry = f->geometry
