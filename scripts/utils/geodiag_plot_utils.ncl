@@ -438,7 +438,7 @@ begin
 
     res2                    = True
     res2@gsLineColor        = "black"
-    res2@gsLineThicknessF   = 0.2
+    res2@gsLineThicknessF   = 0.5
 
     if (.not. is_draw_base_map) then
         plots1 = new(segsDims(0), graphic)
