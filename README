@@ -29,4 +29,7 @@ Usage:
       $ ./geodiag
 
     and some questions will be asked for the necessary arguments of the script.
+
+    There are some demostrations in <path_to_geodiag>/demos, users can try them
+    out!
 --------------------------------------------------------------------------------
