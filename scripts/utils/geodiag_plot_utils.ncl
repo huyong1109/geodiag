@@ -369,3 +369,151 @@ begin
     return lat_idx
 
 end
+
+; ------------------------------------------------------------------------------
+; Description:
+;
+;   This procedure are used to draw China map. The following blogs are refered:
+;
+;     http://bbs.sciencenet.cn/home.php?mod=space&uid=428536&do=blog&id=308001
+;     http://blog.sciencenet.cn/home.php?mod=space&uid=428536&do=blog&id=308032
+;
+; Authors:
+;
+;   Li Dong - 2012-01-27
+; ------------------------------------------------------------------------------
+
+function draw_china_map(wks, compare)
+local res1, res2, res3, res4, f, plots1, plots2, base_map, small_map, map
+begin
+
+    ; ------------------------------------------------------------------------
+    ; draw base map
+    res1                        = True
+    ;res1@gsnDraw                = False
+    res1@gsnFrame               = False
+    res1@mpMinLatF              = 17.
+    res1@mpMaxLatF              = 55.
+    res1@mpMinLonF              = 72.
+    res1@mpMaxLonF              = 136.
+    res1@mpLandFillColor        = "white"
+    res1@mpOceanFillColor       = "white"
+    res1@mpInlandWaterFillColor = "white"
+
+    if (compare) then
+        ; draw china map from NCL
+        res1@mpDataBaseVersion       = "MediumRes"
+        res1@mpOutlineOn             = True
+        res1@mpOutlineBoundarySets   = "National"
+    end if
+
+    base_map = gsn_csm_map(wks, res1)
+
+    is_draw_base_map = False
+    if (isatt(res1, "gsnDraw") .and. res1@gsnDraw) then
+        is_draw_base_map = True
+    end if
+
+    ; ------------------------------------------------------------------------
+    ; draw china map from shapefile directly which is downloaded from:
+    ;   National Fundamental Geographic Information System
+    ;   http://nfgis.nsdi.gov.cn/nfgis/english/default.htm
+    f = addfile("map/bou1_4l.shp", "r")
+
+    segments = f->segments
+    geometry = f->geometry
+    segsDims = dimsizes(f->segments)
+    geomDims = dimsizes(f->geometry)
+
+    geom_segIndex = f@geom_segIndex
+    geom_numSegs  = f@geom_numSegs
+    segs_xyzIndex = f@segs_xyzIndex
+    segs_numPnts  = f@segs_numPnts
+    numFeatures   = geomDims(0)
+
+    lon = f->x
+    lat = f->y
+
+    res2                    = True
+    res2@gsLineColor        = "black"
+    res2@gsLineThicknessF   = 0.2
+
+    if (.not. is_draw_base_map) then
+        plots1 = new(segsDims(0), graphic)
+    end if
+    segNum = 0
+    do i = 0, numFeatures-1
+        start_seg = geometry(i, geom_segIndex)
+        num_seg = geometry(i, geom_numSegs)
+        do seg = start_seg, start_seg+num_seg-1
+            start_point = segments(seg, segs_xyzIndex)
+            end_point = start_point+segments(seg, segs_numPnts)-1
+            if (is_draw_base_map) then
+                gsn_polyline(wks, base_map, \
+                    lon(start_point:end_point), lat(start_point:end_point), res2)
+            else
+                plots1(segNum) = gsn_add_polyline(wks, base_map, \
+                    lon(start_point:end_point), lat(start_point:end_point), res2)
+            end if
+            segNum = segNum+1
+        end do
+    end do
+
+    ; ------------------------------------------------------------------------
+    ; draw south sea area
+    res3                        = True
+    if (.not. is_draw_base_map) then
+        res3@gsnDraw            = False
+    end if
+    res3@gsnFrame               = False
+    res3@mpMinLatF              = 2.0
+    res3@mpMaxLatF              = 23.5
+    res3@mpMinLonF              = 105.0
+    res3@mpMaxLonF              = 123.0
+    res3@vpHeightF              = 0.17
+    res3@vpWidthF               = 0.17
+    res3@mpLandFillColor        = "white"
+    res3@mpOceanFillColor       = "white"
+    res3@mpInlandWaterFillColor = "white"
+    res3@tmXBOn                 = False
+    res3@tmYLOn                 = False
+    res3@tmXTOn                 = False
+    res3@tmYROn                 = False
+
+    small_map = gsn_csm_map(wks, res3)
+
+    if (.not. is_draw_base_map) then
+        plots2 = new(segsDims(0), graphic)
+    end if
+    segNum = 0
+    do i = 0, numFeatures-1
+        start_seg = geometry(i, geom_segIndex)
+        num_seg = geometry(i, geom_numSegs)
+        do seg = start_seg, start_seg+num_seg-1
+            start_point = segments(seg, segs_xyzIndex)
+            end_point = start_point+segments(seg, segs_numPnts)-1
+            if (is_draw_base_map) then
+                gsn_polyline(wks, small_map, \
+                    lon(start_point:end_point), lat(start_point:end_point), res2)
+            else
+                plots2(segNum) = gsn_add_polyline(wks, small_map, \
+                    lon(start_point:end_point), lat(start_point:end_point), res2)
+            end if
+            segNum = segNum+1
+        end do
+    end do
+
+    res4                        = True
+    res4@amParallelPosF         = 0.494
+    res4@amOrthogonalPosF       = 0.493
+    res4@amJust                 = "BottomRight"
+
+    map = gsn_add_annotation(base_map, small_map, res4)
+
+    if (.not. is_draw_base_map) then
+        draw(base_map)
+    end if
+
+    return map
+
+end
