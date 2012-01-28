@@ -373,53 +373,62 @@ end
 ; ------------------------------------------------------------------------------
 ; Description:
 ;
-;   This procedure are used to draw China map. The following blogs are refered:
+;   The following two procedures are used to set resource of the external
+;   plotting and draw China map on it. The following blogs are refered:
 ;
 ;     http://bbs.sciencenet.cn/home.php?mod=space&uid=428536&do=blog&id=308001
 ;     http://blog.sciencenet.cn/home.php?mod=space&uid=428536&do=blog&id=308032
+;
+; Input:
+;
+;   - res: external plotting's resource
+;   - wks: a workspace
+;   - base_plot: the external plotting
+;   - config: configuration
+;     config@gdShowProvince: show province boundaries or not
 ;
 ; Authors:
 ;
 ;   Li Dong - 2012-01-27
 ; ------------------------------------------------------------------------------
 
-function draw_china_map(wks, compare)
-local res1, res2, res3, res4, f, plots1, plots2, base_map, small_map, map
+procedure set_china_map(res)
+begin
+
+    res                         = True
+    res@gsnMaximize             = True
+    res@gsnDraw                 = False
+    res@gsnFrame                = False
+    res@mpMinLatF               = 17.
+    res@mpMaxLatF               = 55.
+    res@mpMinLonF               = 72.
+    res@mpMaxLonF               = 136.
+    res@mpOutlineOn             = False
+    res@mpLandFillColor         = "white"
+    res@mpOceanFillColor        = "white"
+    res@mpInlandWaterFillColor  = "white"
+
+end
+
+procedure draw_china_map(wks, base_plot, config)
+local res1, res2, res3, f, plot1, plot2, small_map, map
 begin
 
     ; ------------------------------------------------------------------------
-    ; draw base map
-    res1                        = True
-    res1@gsnMaximize            = True
-    ;res1@gsnDraw                = False
-    res1@gsnFrame               = False
-    res1@mpMinLatF              = 17.
-    res1@mpMaxLatF              = 55.
-    res1@mpMinLonF              = 72.
-    res1@mpMaxLonF              = 136.
-    res1@mpLandFillColor        = "white"
-    res1@mpOceanFillColor       = "white"
-    res1@mpInlandWaterFillColor = "white"
-
-    if (compare) then
-        ; draw china map from NCL
-        res1@mpDataBaseVersion       = "MediumRes"
-        res1@mpOutlineOn             = True
-        res1@mpOutlineBoundarySets   = "National"
-    end if
-
-    base_map = gsn_csm_map(wks, res1)
-
-    is_draw_base_map = False
-    if (isatt(res1, "gsnDraw") .and. res1@gsnDraw) then
-        is_draw_base_map = True
+    ; set default configuration
+    if (.not. isatt(config, "gdShowProvince")) then
+        config@gdShowProvince = True
     end if
 
     ; ------------------------------------------------------------------------
     ; draw china map from shapefile directly which is downloaded from:
     ;   National Fundamental Geographic Information System
     ;   http://nfgis.nsdi.gov.cn/nfgis/english/default.htm
-    shapefile = systemfunc("echo $GEODIAG_ROOT/scripts/utils/map/bou1_4l.shp")
+    if (config@gdShowProvince) then
+        shapefile = systemfunc("echo $GEODIAG_ROOT/scripts/utils/map/bou2_4l.shp")
+    else
+        shapefile = systemfunc("echo $GEODIAG_ROOT/scripts/utils/map/bou1_4l.shp")
+    end if
     f = addfile(shapefile, "r")
 
     segments = f->segments
@@ -436,13 +445,11 @@ begin
     lon = f->x
     lat = f->y
 
-    res2                    = True
-    res2@gsLineColor        = "black"
-    res2@gsLineThicknessF   = 0.5
+    res1                    = True
+    res1@gsLineColor    = "black"
+    res1@gsLineThicknessF   = 0.5
 
-    if (.not. is_draw_base_map) then
-        plots1 = new(segsDims(0), graphic)
-    end if
+    plot1 = new(segsDims(0), graphic)
     segNum = 0
     do i = 0, numFeatures-1
         start_seg = geometry(i, geom_segIndex)
@@ -450,43 +457,34 @@ begin
         do seg = start_seg, start_seg+num_seg-1
             start_point = segments(seg, segs_xyzIndex)
             end_point = start_point+segments(seg, segs_numPnts)-1
-            if (is_draw_base_map) then
-                gsn_polyline(wks, base_map, \
-                    lon(start_point:end_point), lat(start_point:end_point), res2)
-            else
-                plots1(segNum) = gsn_add_polyline(wks, base_map, \
-                    lon(start_point:end_point), lat(start_point:end_point), res2)
-            end if
+            plot1(segNum) = gsn_add_polyline(wks, base_plot, \
+                lon(start_point:end_point), lat(start_point:end_point), res1)
             segNum = segNum+1
         end do
     end do
 
     ; ------------------------------------------------------------------------
     ; draw south sea area
-    res3                        = True
-    if (.not. is_draw_base_map) then
-        res3@gsnDraw            = False
-    end if
-    res3@gsnFrame               = False
-    res3@mpMinLatF              = 2.0
-    res3@mpMaxLatF              = 23.5
-    res3@mpMinLonF              = 105.0
-    res3@mpMaxLonF              = 123.0
-    res3@vpHeightF              = 0.17
-    res3@vpWidthF               = 0.17
-    res3@mpLandFillColor        = "white"
-    res3@mpOceanFillColor       = "white"
-    res3@mpInlandWaterFillColor = "white"
-    res3@tmXBOn                 = False
-    res3@tmYLOn                 = False
-    res3@tmXTOn                 = False
-    res3@tmYROn                 = False
+    res2                        = True
+    res2@gsnDraw                = False
+    res2@gsnFrame               = False
+    res2@mpMinLatF              = 2.0
+    res2@mpMaxLatF              = 23.5
+    res2@mpMinLonF              = 105.0
+    res2@mpMaxLonF              = 123.0
+    res2@vpHeightF              = 0.17
+    res2@vpWidthF               = 0.17
+    res2@mpLandFillColor        = "white"
+    res2@mpOceanFillColor       = "white"
+    res2@mpInlandWaterFillColor = "white"
+    res2@tmXBOn                 = False
+    res2@tmYLOn                 = False
+    res2@tmXTOn                 = False
+    res2@tmYROn                 = False
 
-    small_map = gsn_csm_map(wks, res3)
+    small_map = gsn_csm_map(wks, res2)
 
-    if (.not. is_draw_base_map) then
-        plots2 = new(segsDims(0), graphic)
-    end if
+    plot2 = new(segsDims(0), graphic)
     segNum = 0
     do i = 0, numFeatures-1
         start_seg = geometry(i, geom_segIndex)
@@ -494,28 +492,19 @@ begin
         do seg = start_seg, start_seg+num_seg-1
             start_point = segments(seg, segs_xyzIndex)
             end_point = start_point+segments(seg, segs_numPnts)-1
-            if (is_draw_base_map) then
-                gsn_polyline(wks, small_map, \
-                    lon(start_point:end_point), lat(start_point:end_point), res2)
-            else
-                plots2(segNum) = gsn_add_polyline(wks, small_map, \
-                    lon(start_point:end_point), lat(start_point:end_point), res2)
-            end if
+            plot2(segNum) = gsn_add_polyline(wks, small_map, \
+                lon(start_point:end_point), lat(start_point:end_point), res1)
             segNum = segNum+1
         end do
     end do
 
-    res4                        = True
-    res4@amParallelPosF         = 0.494
-    res4@amOrthogonalPosF       = 0.493
-    res4@amJust                 = "BottomRight"
+    res3                    = True
+    res3@amParallelPosF     = 0.495
+    res3@amOrthogonalPosF   = 0.495
+    res3@amJust             = "BottomRight"
 
-    map = gsn_add_annotation(base_map, small_map, res4)
+    map = gsn_add_annotation(base_plot, small_map, res3)
 
-    if (.not. is_draw_base_map) then
-        draw(base_map)
-    end if
-
-    return map
+    draw(base_plot)
 
 end
