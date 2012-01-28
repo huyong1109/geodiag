@@ -52,12 +52,21 @@ ul.navigate_bar li a {
 	display: block;
 }
 
-a:link {
+/* link colors */
+ul.navigate_bar a:link {
+	color: yellow;
+}
+
+ul.navigate_bar a:visited {
 	color: white;
 }
 
-a:visited {
+a:link {
 	color: red;
+}
+
+a:visited {
+	color: purple;
 }
 
 /* visual blocks */
