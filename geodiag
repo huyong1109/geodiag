@@ -9,13 +9,19 @@
 #   Li Dong
 # ------------------------------------------------------------------------------
 
+source $GEODIAG_ROOT/scripts/utils/geodiag_cmd_utils.sh
+
 # source the driver for each phenomenon
 for driver in $(find $GEODIAG_ROOT/scripts -name "driver.sh"); do
     source $driver
 done
 
-echo "[Notice]: Which phenomenon do you want to diagnose?"
+notice "Which phenomenon do you want to diagnose?"
 read -p "[phenomenon] > " phenon
 
 # call corresponding driver
+res=$(find $GEODIAG_ROOT -type d -name "$phenon")
+if [[ "$res" == ""  ]] ; then
+    report_error "Unknown phenomenon!"
+fi
 ${phenon}_driver

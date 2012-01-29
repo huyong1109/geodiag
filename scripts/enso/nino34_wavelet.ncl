@@ -23,27 +23,41 @@ load "$GEODIAG_ROOT/scripts/utils/geodiag_plot_utils.ncl"
 
 begin
 
-    if (.not. isdefined("start_date")) then
-        report_error("Start date is not provided with form YYYYMM!")
+    if (.not. isdefined("start_year")) then
+        report_error("Start year is not provided!")
     end if
-    if (.not. isdefined("end_date")) then
-        report_error("End date is not provided with form YYYYMM!")
+    if (.not. isdefined("end_year")) then
+        report_error("End year is not provided!")
     end if
     if (.not. isdefined("file_name")) then
         report_error("SST data file is not provided!")
     end if
-
-    start_year = start_date/100
-    end_year = end_date/100
-    num_time = 12*(end_year-start_year+1)
-    years = fspan(start_year, end_year, num_time)
 
     f = addfile(file_name, "r")
 
     if (.not. isfilevar(f, "time")) then
         report_error("There is no time variable in "+file_name+"!")
     end if
-    dates = ut_calendar(f->time, -2)/100
+    if (isatt(f->time, "units")) then
+        dates = ut_calendar(f->time, -2)/100
+        use_index = False
+    else
+        report_warning("There is no time units, "+ \
+            "so use input years as index instead.")
+        dates = ispan(0, dimsizes(f->time)-1, 1)
+        use_index = True
+    end if
+
+    if (.not. use_index) then
+        start_date = start_year*100+1
+        end_date = end_year*100+12
+        num_time = 12*(end_year-start_year+1)
+    else
+        start_date = start_year
+        end_date = end_year
+        num_time = end_year-start_year+1
+    end if
+    years = fspan(start_year, end_year, num_time)
 
     i = ind(dates .eq. start_date)
     j = ind(dates .eq. end_date)

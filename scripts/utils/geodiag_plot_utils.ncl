@@ -15,6 +15,13 @@ begin
 
 end
 
+procedure report_warning(message)
+begin
+
+    system("echo [Warning]: "+message)
+
+end
+
 procedure report_error(message)
 begin
 
