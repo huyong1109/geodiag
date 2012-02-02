@@ -515,3 +515,43 @@ begin
     draw(base_plot)
 
 end
+
+; ------------------------------------------------------------------------------
+; Description:
+;
+;   The following scripts are used to setup resources for plotting contours.
+;
+; Authors:
+;
+;   Li Dong - 2012-01-31
+; ------------------------------------------------------------------------------
+
+procedure set_default(res, att_name, default)
+begin
+
+    if (.not. isatt(res, att_name)) then
+        res@$att_name$ = default
+    end if
+
+end
+
+procedure setup_contour(res)
+begin
+
+    set_default(res, "gsnFrame", False)
+    set_default(res, "mpCenterLonF", 180.0)
+    set_default(res, "cnFillOn", True)
+    set_default(res, "cnLinesOn", False)
+    set_default(res, "gsnSpreadColors", True)
+
+end
+
+procedure set_contour_range(res, min_value, max_value, stride)
+begin
+
+    res@cnLevelSelectionMode    = "ManualLevels"
+    res@cnMinLevelValF          = min_value
+    res@cnMaxLevelValF          = max_value
+    res@cnLevelSpacingF         = stride
+
+end
