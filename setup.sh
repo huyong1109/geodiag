@@ -11,6 +11,7 @@
 # ------------------------------------------------------------------------------
 
 export GEODIAG_ROOT=$(dirname $BASH_ARGV)
+export GEODIAG_UTILS=$GEODIAG_ROOT/tools/utils
 export PATH=$PATH:$GEODIAG_ROOT
 
 # source other setup.sh scripts

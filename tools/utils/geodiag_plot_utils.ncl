@@ -432,9 +432,9 @@ begin
     ;   National Fundamental Geographic Information System
     ;   http://nfgis.nsdi.gov.cn/nfgis/english/default.htm
     if (config@gdShowProvince) then
-        shapefile = systemfunc("echo $GEODIAG_ROOT/scripts/utils/map/bou2_4l.shp")
+        shapefile = systemfunc("echo $GEODIAG_UTILS/map/bou2_4l.shp")
     else
-        shapefile = systemfunc("echo $GEODIAG_ROOT/scripts/utils/map/bou1_4l.shp")
+        shapefile = systemfunc("echo $GEODIAG_UTILS/map/bou1_4l.shp")
     end if
     f = addfile(shapefile, "r")
 
@@ -519,7 +519,7 @@ end
 ; ------------------------------------------------------------------------------
 ; Description:
 ;
-;   The following scripts are used to setup resources for plotting contours.
+;   The following scripts are used to setup basic resources for plotting.
 ;
 ; Authors:
 ;
@@ -553,5 +553,26 @@ begin
     res@cnMinLevelValF          = min_value
     res@cnMaxLevelValF          = max_value
     res@cnLevelSpacingF         = stride
+
+end
+
+procedure setup_xy(res, x_axis_name, x_axis_coord, y_axis_name, y_axis_coord)
+begin
+
+    set_default(res, "gsnFrame", False)
+    set_default(res, "tiXAxisString", x_axis_name)
+    if (dimsizes(x_axis_coord) .eq. 3) then
+        set_default(res, "tmXBMode", "Manual")
+        set_default(res, "tmXBTickStartF", x_axis_coord(0))
+        set_default(res, "tmXBTickEndF", x_axis_coord(1))
+        set_default(res, "tmXBTickSpacingF", x_axis_coord(2))
+    end if
+    set_default(res, "tiYAxisString", y_axis_name)
+    if (dimsizes(y_axis_coord) .eq. 3) then
+        set_default(res, "tmYLMode", "Manual")
+        set_default(res, "tmYLTickStartF", y_axis_coord(0))
+        set_default(res, "tmYLTickEndF", y_axis_coord(1))
+        set_default(res, "tmYLTickSpacingF", y_axis_coord(2))
+    end if
 
 end
