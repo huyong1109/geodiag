@@ -11,7 +11,9 @@ comments: true
 <h1>2. CUI usage</h1>
 <h1>3. Library usage</h1>
 <p>
-	Several useful NCL functions or procedures are written for researchers who need to cast a NCL script by themself. For the time being, users can load the script as:
+	Several useful NCL functions or procedures are written for researchers who
+	need to cast a NCL script by themself. For the time being, users can load
+	the script as:
 	<div class="text_example">
 		load "$GEODIAG_UTILS/geodiag_plot_utils.ncl"
 	</div>
@@ -21,21 +23,24 @@ comments: true
 		<div class="text_example">
 			res = True<br>
 			<font color="red">
-			set_china_map(res)                   ; ---------- # 1
+			setup_china_map(res)                    ; ---------- #1
 			</font><br>
 			... ; other plotting resources<br>
 			plot = ... ; plot the figure<br>
 			<font color="red">
 			config = True<br>
-			config@gdShowProvince = False        ; ---------- # 2<br>
-			draw_china_map(wks, plot, config)    ; ---------- # 3
+			config@isShowProvince = False           ; ---------- #2<br>
+			config@isShowSouthSea = True<br>
+			attach_china_map(wks, plot, config)     ; ---------- #3<br>
+			draw(plot) ; DO NOT FORGET THIS STEP!!! ; ---------- #4
 			</font>
 		</div>
 		The #1 statement will set the range of lat-lon coordinates, and some
 		other basic setup of a map. Some configurations can be set like #2
-		statement. The #3 statement will draw the China map onto the base plot,
-		which can be just a map or any other plot like contours. The figure
-		without real content is as:<br>
+		statement. The #3 statement will attach the China map onto the base
+		plot, which can be just a map or any other plot like contours. Finally,
+		do not forget to draw the base plot! The figure without real content is
+		as:<br>
 		<img src="assets/pictures/china_map.png" alt="China map"
 		width="600"/><br>
 		<div class="notice">
@@ -44,6 +49,6 @@ comments: true
 			one who want to contribute!
 		</div>
 		For curious users, the internal NCL scripts can be viewed 
-		<a href="https://github.com/lasg-model/geodiag/blob/master/tools/utils/geodiag_plot_utils.ncl#L380">here</a>.
+		<a href="https://github.com/lasg-model/geodiag/blob/master/tools/utils/plot_utils/china_map.ncl">here</a>.
 	</p>
 </p>
