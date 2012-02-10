@@ -20,13 +20,15 @@ comments: true
 		The calling pattern is as following example:
 		<div class="text_example">
 			res = True<br>
-			<font color="red">set_china_map(res) ; ---------- # 1</font><br>
+			<font color="red">
+			set_china_map(res)                   ; ---------- # 1
+			</font><br>
 			... ; other plotting resources<br>
 			plot = ... ; plot the figure<br>
 			<font color="red">
 			config = True<br>
-			config@gdShowProvince = False<br>    ; ---------- # 3
-			draw_china_map(wks, plot, config)    ; ---------- # 2
+			config@gdShowProvince = False        ; ---------- # 2<br>
+			draw_china_map(wks, plot, config)    ; ---------- # 3
 			</font>
 		</div>
 		The #1 statement will set the range of lat-lon coordinates, and some
