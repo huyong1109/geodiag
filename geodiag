@@ -9,7 +9,7 @@
 #   Li Dong
 # ------------------------------------------------------------------------------
 
-source $GEODIAG_ROOT/scripts/utils/geodiag_cmd_utils.sh
+source $GEODIAG_UTILS/geodiag_cmd_utils.sh
 
 # TODO: construct a framework for handling subcommands
 case $1 in
