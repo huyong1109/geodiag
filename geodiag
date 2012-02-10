@@ -11,6 +11,16 @@
 
 source $GEODIAG_ROOT/scripts/utils/geodiag_cmd_utils.sh
 
+# TODO: construct a framework for handling subcommands
+case $1 in
+"update")
+    # for users who are not familiar with git
+    cd $GEODIAG_ROOT
+    git pull
+    exit $?
+    ;;
+esac
+
 # source the driver for each phenomenon
 for driver in $(find $GEODIAG_ROOT/scripts -name "driver.sh"); do
     source $driver

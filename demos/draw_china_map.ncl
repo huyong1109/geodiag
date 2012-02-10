@@ -8,7 +8,7 @@ begin
     wks = gsn_open_wks("pdf", "china_map")
 
     res = True
-    set_china_map(res) ; <--- set the resource for China map
+    setup_china_map(res) ; <--- set the resource for China map
 
     ; --------------------------------------------------------------------------
     ; draw any data you want here
@@ -30,8 +30,10 @@ begin
     ; --------------------------------------------------------------------------
     ; attach China map on the base plot
     config = True
-    config@gdShowProvince = False
-    draw_china_map(wks, plot, config)
+    config@isShowProvince = False
+    config@isShowSouthSea = False
+    attach_china_map(wks, plot, config)
+    draw(plot)
 
     frame(wks)
 
