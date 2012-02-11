@@ -29,3 +29,11 @@ begin
     exit
 
 end
+
+function get_answer()
+begin
+
+    ans = systemfunc("read -e -p '> ' ans && echo $ans")
+    return ans
+
+end

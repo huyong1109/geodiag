@@ -65,3 +65,13 @@ begin
 
 end
 
+procedure check_file_exist(file_names)
+begin
+
+    do i = 0, dimsizes(file_names)-1
+        if (.not. isfile(file_names(i))) then
+            report_error("File "+file_names(i)+" does not exist!")
+        end if
+    end do
+
+end
