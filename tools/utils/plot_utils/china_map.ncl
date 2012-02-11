@@ -19,6 +19,10 @@
 ; Authors:
 ;
 ;   Li Dong - 2012-01-27
+;
+; Organization:
+;
+;   This work is supported by LASG/IAP.
 ; ------------------------------------------------------------------------------
 
 procedure setup_china_map(res)
