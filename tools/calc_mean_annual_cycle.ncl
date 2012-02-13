@@ -143,9 +143,11 @@ begin
                     var(i,:,:,:,:) = var(i,:,:,:,:)+dim_avg_n(f->$var_name$, 0)
                 end if
             end do
-            var = where(ismissing(var), var@missing_value, var/num_year)
         end if
     end do
+    if (.not. is_all_in_one_file) then
+        var = where(ismissing(var), var@missing_value, var/num_year)
+    end if
 
     file_name = var_name+".nc"
     system("test -f "+file_name+" && rm "+file_name)
