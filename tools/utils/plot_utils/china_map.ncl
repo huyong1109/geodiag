@@ -14,7 +14,7 @@
 ;   - base_plot: the external plotting
 ;   - config: configuration
 ;     config@isShowProvince: show province boundaries or not
-;     config@isShowSouthSea: show South China Sea or not
+;     config@isShowSouthChinaSea: show South China Sea or not
 ;
 ; Authors:
 ;
@@ -52,8 +52,8 @@ begin
     if (.not. isatt(config, "isShowProvince")) then
         config@isShowProvince = False
     end if
-    if (.not. isatt(config, "isShowSouthSea")) then
-        config@isShowSouthSea = False
+    if (.not. isatt(config, "isShowSouthChinaSea")) then
+        config@isShowSouthChinaSea = False
     end if
 
     ; ------------------------------------------------------------------------
@@ -102,7 +102,7 @@ begin
 
     ; --------------------------------------------------------------------------
     ; draw south sea area
-    if (config@isShowSouthSea) then
+    if (config@isShowSouthChinaSea) then
         res2                        = True
         res2@gsnDraw                = False
         res2@gsnFrame               = False

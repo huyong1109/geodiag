@@ -31,7 +31,7 @@ begin
     ; attach China map on the base plot
     config = True
     config@isShowProvince = False
-    config@isShowSouthSea = False
+    config@isShowSouthChinaSea = False
     attach_china_map(wks, plot, config)
     draw(plot)
 
