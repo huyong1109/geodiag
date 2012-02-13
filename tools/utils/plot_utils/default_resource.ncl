@@ -49,6 +49,16 @@ begin
         set_default(res, "tmXBTickStartF", x_axis_coord(0))
         set_default(res, "tmXBTickEndF", x_axis_coord(1))
         set_default(res, "tmXBTickSpacingF", x_axis_coord(2))
+        set_default(res, "trXMinF", x_axis_coord(0))
+        set_default(res, "trXMaxF", x_axis_coord(1))
+    else
+        set_default(res, "tmXBMode", "Explicit")
+        set_default(res, "tmXBValues", x_axis_coord)
+        set_default(res, "tmXBLabels", x_axis_coord)
+        set_default(res, "xyXStyle", "Irregular")
+        set_default(res, "xyXIrregularPoints", x_axis_coord)
+        set_default(res, "trXMinF", x_axis_coord(0))
+        set_default(res, "trXMaxF", x_axis_coord(dimsizes(x_axis_coord)-1))
     end if
     set_default(res, "tiYAxisString", y_axis_name)
     if (dimsizes(y_axis_coord) .eq. 3) then
