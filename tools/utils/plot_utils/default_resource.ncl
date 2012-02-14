@@ -24,6 +24,7 @@ begin
     set_default(res, "mpCenterLonF", 180.0)
     set_default(res, "cnFillOn", True)
     set_default(res, "cnLinesOn", False)
+    set_default(res, "cnLineLabelsOn", False)
     set_default(res, "gsnSpreadColors", True)
 
 end
