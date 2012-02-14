@@ -197,7 +197,7 @@ begin
     pres@lbBoxLinesOn = False
 
     ; --------------------------------------------------------------------------
-    ; total cloud fraction panel
+    ; draw cloud fraction panels
     do i = 0, 3
         gsn_panel(wks, (/plots_isccp_obs(i),plots_isccp_sim(i), \
                          plots_modis_obs(i),plots_modis_sim(i), \
