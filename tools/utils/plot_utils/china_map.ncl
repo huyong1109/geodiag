@@ -22,7 +22,11 @@
 ;
 ; Organization:
 ;
-;   This work is supported by LASG/IAP.
+;   This work is supported by LASG/IAP (http://www.lasg.ac.cn/).
+;
+; Release note:
+;
+;   2012-01-27 - First release.
 ; ------------------------------------------------------------------------------
 
 procedure setup_china_map(res)
