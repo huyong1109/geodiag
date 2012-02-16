@@ -110,8 +110,25 @@ begin
     end do
     var@long_name = f1->$var_name$@long_name
     var@units = f1->$var_name$@units
-    var@missing_value = f1->$var_name$@missing_value
-    var@_FillValue = f1->$var_name$@_FillValue
+    ; missing value is very important for averaging operation
+    if (isatt(f1->$var_name$, "_FillValue")) then
+        var@_FillValue = f1->$var_name$@_FillValue
+    end if
+    if (.not. isatt(f1->$var_name$, "missing_value")) then
+        notice("There is no missing_value attribute in "+var_name+".")
+        if (.not. isatt(f1->$var_name$, "_FillValue")) then
+            report_error("No missing_value or _FillValue in "+var_name+"!"+ \
+                "Can not continue.")
+        end if
+        notice("Using _FillValue instead.")
+        var@missing_value = var@_FillValue
+    else
+        var@missing_value = f1->$var_name$@missing_value
+        if (.not. isatt(f1->$var_name$, "_FillValue")) then
+            notice("There is no _FillValue attribute in "+var_name+".")
+            var@_FillValue = var@missing_value
+        end if
+    end if
 
     ; --------------------------------------------------------------------------
     ; average

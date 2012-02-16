@@ -73,6 +73,8 @@ begin
         set_default(res, "tmYLMode", "Explicit")
         set_default(res, "tmYLValues", y_axis_coord)
         set_default(res, "tmYLLabels", y_axis_coord)
+        set_default(res, "xyYStyle", "Irregular")
+        set_default(res, "xyYIrregularPoints", y_axis_coord)
         set_default(res, "trYMinF", y_axis_coord(0))
         set_default(res, "trYMaxF", y_axis_coord(dimsizes(y_axis_coord)-1))
     end if
