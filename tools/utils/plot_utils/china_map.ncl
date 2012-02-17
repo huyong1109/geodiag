@@ -15,6 +15,7 @@
 ;   - config: configuration
 ;     config@isShowProvince: show province boundaries or not
 ;     config@isShowSouthChinaSea: show South China Sea or not
+;     config@isAddMask: add mask to show only China region
 ;
 ; Authors:
 ;
@@ -59,8 +60,9 @@ begin
     if (.not. isatt(config, "isShowSouthChinaSea")) then
         config@isShowSouthChinaSea = False
     end if
+    ; TODO: Testing ...
     if (.not. isatt(config, "isAddMask")) then
-        config@isAddMask = True
+        config@isAddMask = False
     end if
 
     ; ------------------------------------------------------------------------
