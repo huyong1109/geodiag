@@ -28,6 +28,7 @@
 ; Release note:
 ;
 ;   2012-01-27 - First release.
+;   2012-02-17 - Add mask for plotting only China region.
 ; ------------------------------------------------------------------------------
 
 procedure setup_china_map(res)
