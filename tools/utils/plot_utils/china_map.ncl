@@ -110,7 +110,32 @@ begin
     end do
 
     ; --------------------------------------------------------------------------
-    ; draw south sea area
+    ; draw mask for plotting China only
+    if (config@isAddMask) then
+        mask_file = systemfunc("echo $GEODIAG_UTILS/map/china_mask.nc")
+        f = addfile(mask_file, "r")
+
+        res4                    = True
+        res4@gsnDraw            = False
+        res4@gsnFrame           = False
+        res4@cnFillOn           = True
+        res4@cnLinesOn          = False
+        res4@cnLineLabelsOn     = False
+        res4@lbLabelBarOn       = False
+        res4@cnInfoLabelOn      = False
+        res4@cnFillColors       = (/"white", "white","transparent","transparent"/)
+        res4@cnLevelSelectionMode   = "ManualLevels"
+        res4@cnMinLevelValF = 0.0
+        res4@cnMaxLevelValF = 1.0
+        res4@cnLevelSpacingF = 0.5
+
+        base_plot@mask_plot = gsn_csm_contour(wks, f->china_mask(lat|:,lon|:), res4)
+
+        overlay(base_plot, base_plot@mask_plot)
+    end if
+
+    ; --------------------------------------------------------------------------
+    ; draw South China Sea area
     if (config@isShowSouthChinaSea) then
         res2                        = True
         res2@gsnDraw                = False
@@ -152,31 +177,6 @@ begin
         res3@amJust             = "BottomRight"
 
         map = gsn_add_annotation(base_plot, small_map, res3)
-    end if
-
-    ; --------------------------------------------------------------------------
-    ; draw mask for plotting China only
-    if (config@isAddMask) then
-        mask_file = systemfunc("echo $GEODIAG_UTILS/map/china_mask.nc")
-        f = addfile(mask_file, "r")
-
-        res4                    = True
-        res4@gsnDraw            = False
-        res4@gsnFrame           = False
-        res4@cnFillOn           = True
-        res4@cnLinesOn          = False
-        res4@cnLineLabelsOn     = False
-        res4@lbLabelBarOn       = False
-        res4@cnInfoLabelOn      = False
-        res4@cnFillColors       = (/"white", "white","transparent","transparent"/)
-        res4@cnLevelSelectionMode   = "ManualLevels"
-        res4@cnMinLevelValF = 0.0
-        res4@cnMaxLevelValF = 1.0
-        res4@cnLevelSpacingF = 0.5
-
-        base_plot@mask_plot = gsn_csm_contour(wks, f->china_mask(lat|:,lon|:), res4)
-
-        overlay(base_plot, base_plot@mask_plot)
     end if
 
 end

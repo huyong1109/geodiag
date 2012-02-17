@@ -1,5 +1,6 @@
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_code.ncl"
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_csm.ncl"
+load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/contributed.ncl"
 
 load "$GEODIAG_UTILS/geodiag_plot_utils.ncl"
 
@@ -23,8 +24,9 @@ begin
         res@cnLineLabelsOn  = False
 
         var_names = get_file_var_names(f)
+        print(var_names)
 
-        plot = gsn_csm_contour_map(wks, f->$var_names(0)$, res)
+        plot = gsn_csm_contour_map(wks, f->$var_names(12)$(0,:,:), res)
     else
         plot = gsn_csm_map(wks, res)
     end if
@@ -33,7 +35,7 @@ begin
     ; attach China map on the base plot
     config = True
     config@isShowProvince = False
-    config@isShowSouthChinaSea = False
+    config@isShowSouthChinaSea = True
     config@isAddMask = True
     attach_china_map(wks, plot, config)
     draw(plot)
