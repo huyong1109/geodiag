@@ -19,6 +19,8 @@ begin
         res@cnFillOn        = True
         res@cnLinesOn       = False
         res@gsnSpreadColors = True
+        res@lbLabelBarOn    = False
+        res@cnLineLabelsOn  = False
 
         var_names = get_file_var_names(f)
 
@@ -32,6 +34,7 @@ begin
     config = True
     config@isShowProvince = False
     config@isShowSouthChinaSea = False
+    config@isAddMask = True
     attach_china_map(wks, plot, config)
     draw(plot)
 

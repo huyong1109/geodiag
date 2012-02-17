@@ -163,13 +163,12 @@ begin
         res4                    = True
         res4@gsnDraw            = False
         res4@gsnFrame           = False
-        res4@cnFillMode         = "CellFill"
         res4@cnFillOn           = True
         res4@cnLinesOn          = False
         res4@cnLineLabelsOn     = False
         res4@lbLabelBarOn       = False
         res4@cnInfoLabelOn      = False
-        res4@cnFillColors       = (/"white","white","white","transparent"/)
+        res4@cnFillColors       = (/"white", "white","transparent","transparent"/)
         res4@cnLevelSelectionMode   = "ManualLevels"
         res4@cnMinLevelValF = 0.0
         res4@cnMaxLevelValF = 1.0
