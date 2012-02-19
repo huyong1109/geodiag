@@ -16,7 +16,7 @@ case $1 in
 "update")
     # for users who are not familiar with git
     cd $GEODIAG_ROOT
-    if [ ! -f .git ]; then
+    if [ ! -d .git ]; then
         report_error "This copy of GEODIAG is not gained in git way, so update can only be got from https://github.com/lasg-model/geodiag/zipball/master manually."
     fi
     git pull
