@@ -25,14 +25,11 @@ function _geodiag_()
     local prev_argv=${COMP_WORDS[COMP_CWORD-1]}
     local curr_argv=${COMP_WORDS[COMP_CWORD]}
     completed_words=""
-    if [[ "${prev_argv##*/}" == "geodiag" ]]; then
-        # complete subcommands
-        case "$curr_argv" in
-        "")
-            completed_words="update"
-            ;;
-        esac
-    fi
+    case "${prev_argv##*/}" in
+    "geodiag")
+        completed_words="update"
+        ;;
+    esac
     COMPREPLY=($(compgen -W "$completed_words" -- $curr_argv))
 }
 
