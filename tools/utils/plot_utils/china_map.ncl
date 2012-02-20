@@ -116,21 +116,21 @@ begin
         mask_file = systemfunc("echo $GEODIAG_UTILS/map/china_mask.nc")
         f = addfile(mask_file, "r")
 
-        res4                    = True
-        res4@gsnDraw            = False
-        res4@gsnFrame           = False
-        res4@cnFillOn           = True
-        res4@cnLinesOn          = False
-        res4@cnLineLabelsOn     = False
-        res4@lbLabelBarOn       = False
-        res4@cnInfoLabelOn      = False
-        res4@cnFillColors       = (/"white", "white","transparent","transparent"/)
-        res4@cnLevelSelectionMode   = "ManualLevels"
-        res4@cnMinLevelValF = 0.0
-        res4@cnMaxLevelValF = 1.0
-        res4@cnLevelSpacingF = 0.5
+        res2                 = True
+        res2@gsnDraw         = False
+        res2@gsnFrame        = False
+        res2@cnFillOn        = True
+        res2@cnLinesOn       = False
+        res2@cnLineLabelsOn  = False
+        res2@lbLabelBarOn    = False
+        res2@cnInfoLabelOn   = False
+        res2@cnFillColors    = (/"white","white","transparent","transparent"/)
+        res2@cnLevelSelectionMode = "ManualLevels"
+        res2@cnMinLevelValF  = 0.0
+        res2@cnMaxLevelValF  = 1.0
+        res2@cnLevelSpacingF = 0.5
 
-        base_plot@mask_plot = gsn_csm_contour(wks, f->china_mask(lat|:,lon|:), res4)
+        base_plot@mask_plot = gsn_csm_contour(wks, f->china_mask(lat|:,lon|:), res2)
 
         overlay(base_plot, base_plot@mask_plot)
     end if
@@ -138,24 +138,24 @@ begin
     ; --------------------------------------------------------------------------
     ; draw South China Sea area
     if (config@isShowSouthChinaSea) then
-        res2                        = True
-        res2@gsnDraw                = False
-        res2@gsnFrame               = False
-        res2@mpMinLatF              = 2.0
-        res2@mpMaxLatF              = 23.5
-        res2@mpMinLonF              = 105.0
-        res2@mpMaxLonF              = 123.0
-        res2@vpHeightF              = 0.17
-        res2@vpWidthF               = 0.17
-        res2@mpLandFillColor        = "white"
-        res2@mpOceanFillColor       = "white"
-        res2@mpInlandWaterFillColor = "white"
-        res2@tmXBOn                 = False
-        res2@tmYLOn                 = False
-        res2@tmXTOn                 = False
-        res2@tmYROn                 = False
+        res3                        = True
+        res3@gsnDraw                = False
+        res3@gsnFrame               = False
+        res3@mpMinLatF              = 2.0
+        res3@mpMaxLatF              = 23.5
+        res3@mpMinLonF              = 105.0
+        res3@mpMaxLonF              = 123.0
+        res3@vpHeightF              = 0.17
+        res3@vpWidthF               = 0.17
+        res3@mpLandFillColor        = "white"
+        res3@mpOceanFillColor       = "white"
+        res3@mpInlandWaterFillColor = "white"
+        res3@tmXBOn                 = False
+        res3@tmYLOn                 = False
+        res3@tmXTOn                 = False
+        res3@tmYROn                 = False
 
-        small_map = gsn_csm_map(wks, res2)
+        small_map = gsn_csm_map(wks, res3)
 
         plot2 = new(segsDims(0), graphic)
         segNum = 0
@@ -172,12 +172,12 @@ begin
             end do
         end do
 
-        res3                    = True
-        res3@amParallelPosF     = 0.495
-        res3@amOrthogonalPosF   = 0.495
-        res3@amJust             = "BottomRight"
+        res4                    = True
+        res4@amParallelPosF     = 0.495
+        res4@amOrthogonalPosF   = 0.495
+        res4@amJust             = "BottomRight"
 
-        map = gsn_add_annotation(base_plot, small_map, res3)
+        map = gsn_add_annotation(base_plot, small_map, res4)
     end if
 
 end
