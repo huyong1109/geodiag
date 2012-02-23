@@ -37,6 +37,7 @@ begin
     config@isShowProvince = False
     config@isShowSouthChinaSea = True
     config@isAddMask = True
+    config@isShowRivers = True
     attach_china_map(wks, plot, config)
     draw(plot)
 

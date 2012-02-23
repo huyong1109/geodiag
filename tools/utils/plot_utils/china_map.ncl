@@ -15,7 +15,8 @@
 ;   - config: configuration
 ;     config@isShowProvince: show province boundaries or not
 ;     config@isShowSouthChinaSea: show South China Sea or not
-;     config@isAddMask: add mask to show only China region
+;     config@isAddMask: add mask to show only China region or not
+;     config@isShowRivers: show first class rivers or not
 ;
 ; Authors:
 ;
@@ -29,7 +30,45 @@
 ;
 ;   2012-01-27 - First release.
 ;   2012-02-17 - Add mask for plotting only China region.
+;   2012-02-23 - Add option for plotting first class rivers
 ; ------------------------------------------------------------------------------
+
+procedure plot_shapefile(wks, base_plot, attach_plot, shapefile, res)
+begin
+
+    f = addfile(shapefile, "r")
+
+    segments = f->segments
+    geometry = f->geometry
+    segsDims = dimsizes(f->segments)
+    geomDims = dimsizes(f->geometry)
+
+    geom_segIndex = f@geom_segIndex
+    geom_numSegs  = f@geom_numSegs
+    segs_xyzIndex = f@segs_xyzIndex
+    segs_numPnts  = f@segs_numPnts
+    numFeatures   = geomDims(0)
+
+    lon = f->x
+    lat = f->y
+
+    res@gsLineThicknessF = 0.5
+
+    segNum = 0
+    do i = 0, numFeatures-1
+        start_seg = geometry(i, geom_segIndex)
+        num_seg = geometry(i, geom_numSegs)
+        do seg = start_seg, start_seg+num_seg-1
+            start_point = segments(seg, segs_xyzIndex)
+            end_point = start_point+segments(seg, segs_numPnts)-1
+            base_plot@$unique_string("china_map")$ = \
+                gsn_add_polyline(wks, attach_plot, \
+                lon(start_point:end_point), lat(start_point:end_point), res)
+            segNum = segNum+1
+        end do
+    end do
+
+end
 
 procedure setup_china_map(res)
 begin
@@ -61,9 +100,11 @@ begin
     if (.not. isatt(config, "isShowSouthChinaSea")) then
         config@isShowSouthChinaSea = False
     end if
-    ; TODO: Testing ...
     if (.not. isatt(config, "isAddMask")) then
         config@isAddMask = False
+    end if
+    if (.not. isatt(config, "isShowRivers")) then
+        config@isShowRivers = False
     end if
 
     ; ------------------------------------------------------------------------
@@ -71,44 +112,21 @@ begin
     ;   National Fundamental Geographic Information System
     ;   http://nfgis.nsdi.gov.cn/nfgis/english/default.htm
     if (config@isShowProvince) then
-        shapefile = systemfunc("echo $GEODIAG_UTILS/map/bou2_4l.shp")
+        china_shp = systemfunc("echo $GEODIAG_UTILS/map/bou2_4l.shp")
     else
-        shapefile = systemfunc("echo $GEODIAG_UTILS/map/bou1_4l.shp")
+        china_shp = systemfunc("echo $GEODIAG_UTILS/map/bou1_4l.shp")
     end if
-    f = addfile(shapefile, "r")
-
-    segments = f->segments
-    geometry = f->geometry
-    segsDims = dimsizes(f->segments)
-    geomDims = dimsizes(f->geometry)
-
-    geom_segIndex = f@geom_segIndex
-    geom_numSegs  = f@geom_numSegs
-    segs_xyzIndex = f@segs_xyzIndex
-    segs_numPnts  = f@segs_numPnts
-    numFeatures   = geomDims(0)
-
-    lon = f->x
-    lat = f->y
-
     res1                    = True
     res1@gsLineColor        = "black"
-    res1@gsLineThicknessF   = 0.5
+    plot_shapefile(wks, base_plot, base_plot, china_shp, res1)
 
-    plot1 = new(segsDims(0), graphic)
-    segNum = 0
-    do i = 0, numFeatures-1
-        start_seg = geometry(i, geom_segIndex)
-        num_seg = geometry(i, geom_numSegs)
-        do seg = start_seg, start_seg+num_seg-1
-            start_point = segments(seg, segs_xyzIndex)
-            end_point = start_point+segments(seg, segs_numPnts)-1
-            base_plot@$unique_string("china_map")$ = \
-                gsn_add_polyline(wks, base_plot, \
-                lon(start_point:end_point), lat(start_point:end_point), res1)
-            segNum = segNum+1
-        end do
-    end do
+    ; --------------------------------------------------------------------------
+    ; draw rivers
+    if (config@isShowRivers) then
+        river_shp = systemfunc("echo $GEODIAG_UTILS/map/hyd1_4l.shp")
+        plot_shapefile(wks, base_plot, base_plot, river_shp, res1)
+    end if
+
 
     ; --------------------------------------------------------------------------
     ; draw mask for plotting China only
@@ -157,20 +175,7 @@ begin
 
         small_map = gsn_csm_map(wks, res3)
 
-        plot2 = new(segsDims(0), graphic)
-        segNum = 0
-        do i = 0, numFeatures-1
-            start_seg = geometry(i, geom_segIndex)
-            num_seg = geometry(i, geom_numSegs)
-            do seg = start_seg, start_seg+num_seg-1
-                start_point = segments(seg, segs_xyzIndex)
-                end_point = start_point+segments(seg, segs_numPnts)-1
-                base_plot@$unique_string("china_map")$ = \
-                    gsn_add_polyline(wks, small_map, \
-                    lon(start_point:end_point), lat(start_point:end_point), res1)
-                segNum = segNum+1
-            end do
-        end do
+        plot_shapefile(wks, base_plot, small_map, china_shp, res1)
 
         res4                    = True
         res4@amParallelPosF     = 0.495
