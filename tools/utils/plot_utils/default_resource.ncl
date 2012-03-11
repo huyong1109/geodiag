@@ -29,13 +29,18 @@ begin
 
 end
 
-procedure set_contour_range(res, min_value, max_value, stride)
+procedure set_contour_range(res, min_value, max_value, stride, format)
 begin
+
+    num_level = floattointeger((max_value-min_value)/stride)+2
+    levels    = fspan(min_value, max_value, num_level)
 
     res@cnLevelSelectionMode    = "ManualLevels"
     res@cnMinLevelValF          = min_value
     res@cnMaxLevelValF          = max_value
     res@cnLevelSpacingF         = stride
+    res@lbLabelStrings          = sprintf(format, levels)
+    res@lbLabelAlignment        = "BoxCenters"
 
 end
 
