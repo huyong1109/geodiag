@@ -1,6 +1,6 @@
+load "$GEODIAG_UTILS/plot_utils/default_resource.ncl"
 load "$GEODIAG_UTILS/plot_utils/message.ncl"
 load "$GEODIAG_UTILS/plot_utils/data_file.ncl"
 load "$GEODIAG_UTILS/plot_utils/select_region.ncl"
 load "$GEODIAG_UTILS/plot_utils/china_map.ncl"
-load "$GEODIAG_UTILS/plot_utils/default_resource.ncl"
 load "$GEODIAG_UTILS/plot_utils/taylor_diagram.ncl"

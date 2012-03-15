@@ -35,9 +35,11 @@ begin
     ; attach China map on the base plot
     config = True
     config@isShowProvince = False
-    config@isShowSouthChinaSea = True
+    config@isShowSouthChinaSea = False
     config@isAddMask = True
     config@isShowRivers = True
+    config@riverColor = "red"
+    config@riverThickness = 1.0
     attach_china_map(wks, plot, config)
     draw(plot)
 

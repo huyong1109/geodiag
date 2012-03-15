@@ -17,6 +17,10 @@
 ;     config@isShowSouthChinaSea: show South China Sea or not
 ;     config@isAddMask: add mask to show only China region or not
 ;     config@isShowRivers: show first class rivers or not
+;     config@boundaryColor: set the color of boundary
+;     config@boundaryThickness: set the thickness of boundary
+;     config@riverColor: set the color of rivers
+;     config@riverThickness: set the thickness of rivers
 ;
 ; Authors:
 ;
@@ -31,6 +35,8 @@
 ;   2012-01-27 - First release.
 ;   2012-02-17 - Add mask for plotting only China region.
 ;   2012-02-23 - Add option for plotting first class rivers
+;   2012-03-15 - Add control on the thickness and color of the boundary
+;                and rivers.
 ; ------------------------------------------------------------------------------
 
 procedure plot_shapefile(wks, base_plot, attach_plot, shapefile, res)
@@ -94,18 +100,14 @@ begin
 
     ; ------------------------------------------------------------------------
     ; set default configuration
-    if (.not. isatt(config, "isShowProvince")) then
-        config@isShowProvince = False
-    end if
-    if (.not. isatt(config, "isShowSouthChinaSea")) then
-        config@isShowSouthChinaSea = False
-    end if
-    if (.not. isatt(config, "isAddMask")) then
-        config@isAddMask = False
-    end if
-    if (.not. isatt(config, "isShowRivers")) then
-        config@isShowRivers = False
-    end if
+    set_default(config, "isShowProvince", False)
+    set_default(config, "isShowSouthChinaSea", False)
+    set_default(config, "isAddMask", False)
+    set_default(config, "isShowRivers", False)
+    set_default(config, "riverColor", "black")
+    set_default(config, "riverThickness", 0.5)
+    set_default(config, "boundaryColor", "black")
+    set_default(config, "boundaryThickness", 0.5)
 
     ; ------------------------------------------------------------------------
     ; draw china map from shapefile directly which is downloaded from:
@@ -117,13 +119,16 @@ begin
         china_shp = systemfunc("echo $GEODIAG_UTILS/map/bou1_4l.shp")
     end if
     res1                    = True
-    res1@gsLineColor        = "black"
+    res1@gsLineColor        = config@boundaryColor
+    res1@gsLineThicknessF   = config@boundaryThickness
     plot_shapefile(wks, base_plot, base_plot, china_shp, res1)
 
     ; --------------------------------------------------------------------------
     ; draw rivers
     if (config@isShowRivers) then
         river_shp = systemfunc("echo $GEODIAG_UTILS/map/hyd1_4l.shp")
+        res1@gsLineColor        = config@riverColor
+        res1@gsLineThicknessF   = config@riverThickness
         plot_shapefile(wks, base_plot, base_plot, river_shp, res1)
     end if
 
@@ -175,6 +180,8 @@ begin
 
         small_map = gsn_csm_map(wks, res3)
 
+        res1@gsLineColor            = config@boundaryColor
+        res1@gsLineThicknessF       = config@boundaryThickness
         plot_shapefile(wks, base_plot, small_map, china_shp, res1)
 
         res4                    = True
