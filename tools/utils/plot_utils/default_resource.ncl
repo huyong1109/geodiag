@@ -17,6 +17,51 @@ begin
 
 end
 
+procedure setup_map(projection, res)
+begin
+
+    set_default(res, "gsnDraw", False)
+    set_default(res, "gsnFrame", False)
+    set_default(res, "gsnMaximize", True)
+    set_default(res, "mpGreatCircleLinesOn", True)
+    set_default(res, "mpGridAndLimbOn", False)
+    set_default(res, "mpFillOn", False)
+    set_default(res, "mpCenterLonF", 180.0)
+
+    if (isatt(projection, "center_lon")) then
+        res@mpCenterLonF = doubletofloat(projection@center_lon)
+    end if
+    if (isatt(projection, "center_lat")) then
+        res@mpCenterLatF = doubletofloat(projection@center_lat)
+    end if
+
+    if (projection .eq. "ST") then
+        res@mpProjection          = "satellite"
+        res@mpSatelliteDistF      = 3.0
+        res@mpGridLineDashPattern = 2
+        res@vpXF                  = 0.1
+        res@vpYF                  = 0.9
+        res@vpWidthF              = 0.8
+        res@vpHeightF             = 0.7
+        if (isatt(projection, "angle")) then
+            res@mpLimitMode    = "angles"
+            res@mpLeftAngleF   = projection@angle
+            res@mpRightAngleF  = projection@angle
+            res@mpBottomAngleF = projection@angle
+            res@mpTopAngleF    = projection@angle
+        end if
+    end if
+    if (projection .eq. "NH") then
+        res@gsnPolar = "NH"
+        res@mpMinLatF = projection@min_lat
+    end if
+    if (projection .eq. "SH") then
+        res@gsnPolar = "SH"
+        res@mpMaxLatF = projection@max_lat
+    end if
+
+end
+
 procedure setup_contour(res)
 begin
 
@@ -35,12 +80,13 @@ begin
     num_level = floattointeger((max_value-min_value)/stride)+2
     levels    = fspan(min_value, max_value, num_level)
 
-    res@cnLevelSelectionMode    = "ManualLevels"
-    res@cnMinLevelValF          = min_value
-    res@cnMaxLevelValF          = max_value
+    ;res@cnLevelSelectionMode    = "ManualLevels"
+    ;res@cnMinLevelValF          = min_value
+    ;res@cnMaxLevelValF          = max_value
     res@cnLevelSpacingF         = stride
-    res@lbLabelStrings          = sprintf(format, levels)
-    res@lbLabelAlignment        = "BoxCenters"
+    res@lbLabelStride = 4
+    ;res@lbLabelStrings          = sprintf(format, levels)
+    ;res@lbLabelAlignment        = "BoxCenters"
 
 end
 
