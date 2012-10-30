@@ -58,8 +58,6 @@ begin
     lon = f->x
     lat = f->y
 
-    res@gsLineThicknessF = 0.5
-
     segNum = 0
     do i = 0, numFeatures-1
         start_seg = geometry(i, geom_segIndex)
