@@ -21,6 +21,7 @@
 ;     config@boundaryThickness: set the thickness of boundary
 ;     config@riverColor: set the color of rivers
 ;     config@riverThickness: set the thickness of rivers
+;     config@southChinaSeaMapWidth: set the width of the small map
 ;
 ; Authors:
 ;
@@ -37,6 +38,7 @@
 ;   2012-02-23 - Add option for plotting first class rivers
 ;   2012-03-15 - Add control on the thickness and color of the boundary
 ;                and rivers.
+;   2013-01-28 - Add the control on the South China Sea small map.
 ; ------------------------------------------------------------------------------
 
 procedure plot_shapefile(wks, base_plot, attach_plot, shapefile, res)
@@ -106,6 +108,7 @@ begin
     set_default(config, "riverThickness", 0.5)
     set_default(config, "boundaryColor", "black")
     set_default(config, "boundaryThickness", 0.5)
+    set_default(config, "southChinaSeaMapWidth", 0.17)
 
     ; ------------------------------------------------------------------------
     ; draw china map from shapefile directly which is downloaded from:
@@ -166,8 +169,7 @@ begin
         res3@mpMaxLatF              = 23.5
         res3@mpMinLonF              = 105.0
         res3@mpMaxLonF              = 123.0
-        res3@vpHeightF              = 0.17
-        res3@vpWidthF               = 0.17
+        res3@vpWidthF               = config@southChinaSeaMapWidth
         res3@mpLandFillColor        = "white"
         res3@mpOceanFillColor       = "white"
         res3@mpInlandWaterFillColor = "white"
