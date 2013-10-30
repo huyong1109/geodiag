@@ -98,8 +98,9 @@ NhlErrorTypes eemd_ncl_wrapper(void) {
 
     /* TODO: Figure out how to convert 2D array pointer to 1D. */
     float *tmp = malloc(sizeof(float)*nm*ns);
-    for (int m = 0; m < nm; ++m) {
-        for (int i = 0; i < ns; ++i) {
+    int m, i;
+    for (m = 0; m < nm; ++m) {
+        for (i = 0; i < ns; ++i) {
             tmp[m*ns+i] = imf[m][i];
         }
     }

@@ -1,5 +1,13 @@
 CC = nhlcc
-LD = gcc
+
+OS = $(shell uname)
+
+ifeq ($(OS),Darwin)
+	LD = gcc -bundle -flat_namespace -undefined suppress
+endif
+ifeq ($(OS),Linux)
+	LD = ld -G
+endif
 
 CFLAGS = -g
 
@@ -15,7 +23,7 @@ VPATH = $(D)
 	 fi
 
 eemd.so: $(OBJECTS)
-	@$(LD) -bundle -flat_namespace -undefined suppress $^ -o $@
+	@$(LD) $^ -o $@
 
 .PHONY:
 clean:
