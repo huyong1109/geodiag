@@ -3,3 +3,5 @@ data
 *.nc
 *.pdf
 amip
+*.o
+*.so

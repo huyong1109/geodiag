@@ -115,9 +115,9 @@ begin
     ;   National Fundamental Geographic Information System
     ;   http://nfgis.nsdi.gov.cn/nfgis/english/default.htm
     if (config@isShowProvince) then
-        china_shp = systemfunc("echo $GEODIAG_UTILS/map/bou2_4l.shp")
+        china_shp = systemfunc("echo $GEODIAG_TOOLS/data/map/bou2_4l.shp")
     else
-        china_shp = systemfunc("echo $GEODIAG_UTILS/map/bou1_4l.shp")
+        china_shp = systemfunc("echo $GEODIAG_TOOLS/data/map/bou1_4l.shp")
     end if
     res1                    = True
     res1@gsLineColor        = config@boundaryColor
@@ -127,7 +127,7 @@ begin
     ; --------------------------------------------------------------------------
     ; draw rivers
     if (config@isShowRivers) then
-        river_shp = systemfunc("echo $GEODIAG_UTILS/map/hyd1_4l.shp")
+        river_shp = systemfunc("echo $GEODIAG_TOOLS/data/map/hyd1_4l.shp")
         res1@gsLineColor        = config@riverColor
         res1@gsLineThicknessF   = config@riverThickness
         plot_shapefile(wks, base_plot, base_plot, river_shp, res1)
@@ -137,7 +137,7 @@ begin
     ; --------------------------------------------------------------------------
     ; draw mask for plotting China only
     if (config@isAddMask) then
-        mask_file = systemfunc("echo $GEODIAG_UTILS/map/china_mask.nc")
+        mask_file = systemfunc("echo $GEODIAG_TOOLS/data/map/china_mask.nc")
         f = addfile(mask_file, "r")
 
         res2                 = True

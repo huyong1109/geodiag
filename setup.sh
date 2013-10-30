@@ -11,8 +11,13 @@
 # ------------------------------------------------------------------------------
 
 export GEODIAG_ROOT=$(dirname $BASH_ARGV)
-export GEODIAG_UTILS=$GEODIAG_ROOT/tools/utils
+export GEODIAG_TOOLS=$GEODIAG_ROOT/tools
 export PATH=$PATH:$GEODIAG_ROOT
+
+source $GEODIAG_TOOLS/build.sh
+
+# shared objects that can be loaded by NCL
+export NCL_DEF_LIB_DIR=$GEODIAG_TOOLS/shared
 
 # source other setup.sh scripts
 for setup_script in $(find $GEODIAG_ROOT/scripts -name setup.sh); do
