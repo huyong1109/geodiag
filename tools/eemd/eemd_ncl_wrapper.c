@@ -90,23 +90,14 @@ NhlErrorTypes eemd_ncl_wrapper(void) {
     /* call real eemd function */
     int ns = dimsizes_s[0];
     int nm;
-    float **imf;
+    float *imf;
 
     eemd(ns, s, *ne, *nr, &nm, &imf);
 
     ng_size_t dimsizes_imf[2] = { nm, ns };
 
-    /* TODO: Figure out how to convert 2D array pointer to 1D. */
-    float *tmp = malloc(sizeof(float)*nm*ns);
-    int m, i;
-    for (m = 0; m < nm; ++m) {
-        for (i = 0; i < ns; ++i) {
-            tmp[m*ns+i] = imf[m][i];
-        }
-    }
-
     return NclReturnValue(
-            (void*)tmp,
+            (void*)imf,
             2,
             dimsizes_imf,
             NULL,

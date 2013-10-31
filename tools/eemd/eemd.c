@@ -44,7 +44,7 @@ float randn()
     [Note]: Assume the first column has already been filled with s.
  */
 
-void emd(int ns, float *s, int nm, float **imf) {
+void emd(int ns, float *s, int nm, float *imf) {
     int numMax, numMin, ret, i, m, iter;
     const int numIter = 10;
     float *max = malloc(sizeof(float)*ns);
@@ -106,14 +106,14 @@ void emd(int ns, float *s, int nm, float **imf) {
         /* ------------------------------------------------------------------ */
         /* calculate the intrinsic mode function and residue */
         for (i = 0; i < ns; ++i) {
-            imf[m][i] = y[i];
+            imf[m*ns+i] = y[i];
             r[i] -= y[i];
         }
     }
     /* ---------------------------------------------------------------------- */
     /* record the residual */
     for (i = 0; i < ns; ++i) {
-        imf[nm-1][i] = r[i];
+        imf[(nm-1)*ns+i] = r[i];
     }
 
     free(max); free(maxLoc); free(maxEnv);
@@ -138,7 +138,7 @@ void emd(int ns, float *s, int nm, float **imf) {
     [Output] The decomposed intrinsic mode functions (2d matrix)
  */
 
-void eemd(int ns, float *s, int ne, float nr, int *nm, float ***imf) {
+void eemd(int ns, float *s, int ne, float nr, int *nm, float **imf) {
     int i, m, e;
     /* ---------------------------------------------------------------------- */
     /* turn standard deviation of signal to one */
@@ -160,38 +160,25 @@ void eemd(int ns, float *s, int ne, float nr, int *nm, float ***imf) {
     /* allocate memory for results */
     /* NOTE: The first column is the original signal */
     *nm = (int)(log2(ns))-1+2;
-    *imf = malloc(sizeof(float*)*(*nm));
-    for (m = 0; m < *nm; ++m) {
-        (*imf)[m] = malloc(sizeof(float)*ns);
-    }
-    /* ---------------------------------------------------------------------- */
-    /* initialize variables and random number generator */
-    for (m = 0; m < *nm; ++m) {
-        for (i = 0; i < ns; ++i) {
-            (*imf)[m][i] = 0.0;
-        }
-    }
+    *imf = calloc((*nm)*ns, sizeof(float));
     /* ---------------------------------------------------------------------- */
     /* run ensemble and add white-noise */
     for (e = 0; e < ne; ++e) {
         float *se = malloc(sizeof(float)*ns);
-        float **imfe = malloc(sizeof(float*)*(*nm));
-        for (m = 0; m < *nm; ++m) {
-            imfe[m] = malloc(sizeof(float)*ns);
-        }
+        float *imfe = malloc(sizeof(float)*(*nm)*ns);
         /* add white-noise to original signal */
         srand(time(NULL));
         for (i = 0; i < ns; ++i) {
             se[i] = s[i]+nr*randn();
             /* record the original signal into the first column */
-            imfe[0][i] = s[i];
+            imfe[i] = s[i];
         }
         /* call EMD */
         emd(ns, se, *nm, imfe);
         /* accumulate results */
         for (m = 0; m < *nm; ++m) {
             for (i = 0; i < ns; ++i) {
-                (*imf)[m][i] += imfe[m][i];
+                (*imf)[m*ns+i] += imfe[m*ns+i];
             }
         }
         free(se); free(imfe);
@@ -203,7 +190,7 @@ void eemd(int ns, float *s, int ne, float nr, int *nm, float ***imf) {
     }
     for (m = 0; m < *nm; ++m) {
         for (i = 0; i < ns; ++i) {
-            (*imf)[m][i] *= sd/ne;
+            (*imf)[m*ns+i] *= sd/ne;
         }
     }
 }
