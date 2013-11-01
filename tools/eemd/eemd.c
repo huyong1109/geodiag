@@ -4,30 +4,27 @@
 #include <time.h>
 #include <ncarg/ngmath.h>
 
-float randn()
-{
-    float U1, U2, W, mult;
-    static float X1, X2;
-    static int call = 0;
+float randn() {
+    float u, v, s;
+    static float x, y;
+    static int flag = 0;
 
-    if (call == 1)
-    {
-        call = !call;
-        return X2;
+    if (flag == 1) {
+        flag = !flag;
+        return y;
     }
 
-    do {
-        U1 = -1+((float)rand()/RAND_MAX)*2;
-        U2 = -1+((float)rand()/RAND_MAX)*2;
-        W = pow(U1, 2)+pow(U2, 2);
-    } while (W >= 1 || W == 0);
+    s = 1;
+    while (s >= 1) {
+        u = -1+(float)rand()/RAND_MAX*2;
+        v = -1+(float)rand()/RAND_MAX*2;
+        s = u*u+v*v;
+    }
+    x = u*sqrt(-2*log(s)/s);
+    y = v*sqrt(-2*log(s)/s);
 
-    mult = sqrt((-2*log(W))/W);
-    X1 = U1*mult;
-    X2 = U2*mult;
-
-    call = !call;
-    return X1;
+    flag = !flag;
+    return x;
 }
 
 /*!
@@ -38,7 +35,7 @@ float randn()
  @param s
     [Input] The given signal
  @param nm
-    [Output] The actual number of intrinsic mode functions
+    [Input] The actual number of intrinsic mode functions
  @param imf
     [Output] The decomposed intrinsic mode functions (2d matrix)
     [Note]: Assume the first column has already been filled with s.
@@ -128,17 +125,17 @@ void emd(int ns, float *s, int nm, float *imf) {
     [Input] The sample number of signal
  @param s
     [Input] The given signal
- @param ne
-    [Input] The ensemble number
  @param nr
     [Input] The ratio of standard deviation of added noise and signal
+ @param ne
+    [Input] The ensemble number
  @param nm
     [Output] The number of intrinsic mode functions (plus original signal)
  @param imf
     [Output] The decomposed intrinsic mode functions (2d matrix)
  */
 
-void eemd(int ns, float *s, int ne, float nr, int *nm, float **imf) {
+void eemd(int ns, float *s, float nr, int ne, int *nm, float **imf) {
     int i, m, e;
     /* ---------------------------------------------------------------------- */
     /* turn standard deviation of signal to one */
@@ -161,13 +158,13 @@ void eemd(int ns, float *s, int ne, float nr, int *nm, float **imf) {
     /* NOTE: The first column is the original signal */
     *nm = (int)(log2(ns))-1+2;
     *imf = calloc((*nm)*ns, sizeof(float));
+    srand(time(NULL));
     /* ---------------------------------------------------------------------- */
     /* run ensemble and add white-noise */
     for (e = 0; e < ne; ++e) {
         float *se = malloc(sizeof(float)*ns);
         float *imfe = malloc(sizeof(float)*(*nm)*ns);
         /* add white-noise to original signal */
-        srand(time(NULL));
         for (i = 0; i < ns; ++i) {
             se[i] = s[i]+nr*randn();
             /* record the original signal into the first column */

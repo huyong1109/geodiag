@@ -7,10 +7,10 @@ load "$GEODIAG_ROOT/geodiag.ncl"
 begin
 
     PI = atan(1.0)*4.0
-    x = fspan(0.0, 2.0*PI, 1000)
+    x = fspan(0.0, 2.0*PI, 100)
     s = sin(x)
 
-    imf = eemd(s, 1000, 0.2)
+    imf = eemd(s, 0.0, 1000)
 
     wks = gsn_open_wks("pdf", "eemd")
 
