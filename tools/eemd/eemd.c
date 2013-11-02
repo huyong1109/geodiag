@@ -2,7 +2,7 @@
 #include <math.h>
 #include <stdio.h>
 #include <time.h>
-#include <ncarg/ngmath.h>
+#include "spline.h"
 
 float randn() {
     float u, v, s;
@@ -83,17 +83,8 @@ void emd(int ns, float *s, int nm, float *imf) {
             numMax++; numMin++;
             /* -------------------------------------------------------------- */
             /* calculate cubic spline of the envelope */
-            c_ftsetr("sig", 0.0);
-            ret = c_ftcurv(numMax, maxLoc, max, ns, x, maxEnv);
-            if (ret != 0) {
-                printf("Error: c_ftcurv return %d for maxima!\n", ret);
-                exit(-1);
-            }
-            ret = c_ftcurv(numMin, minLoc, min, ns, x, minEnv);
-            if (ret != 0) {
-                printf("Error: c_ftcurv return %d for minima!\n", ret);
-                exit(-1);
-            }
+            cubic_spline(numMax, maxLoc, max, ns, x, maxEnv);
+            cubic_spline(numMin, minLoc, min, ns, x, minEnv);
             /* -------------------------------------------------------------- */
             /* calculate the difference between envelope mean and signal */
             for (i = 0; i < ns; ++i) {
@@ -118,22 +109,6 @@ void emd(int ns, float *s, int nm, float *imf) {
     free(x); free(y); free(r);
 }
 
-/*!
- @function eemd
- @abstract This function calculate ensembled EMD on the given signal.
- @param ns
-    [Input] The sample number of signal
- @param s
-    [Input] The given signal
- @param nr
-    [Input] The ratio of standard deviation of added noise and signal
- @param ne
-    [Input] The ensemble number
- @param nm
-    [Output] The number of intrinsic mode functions (plus original signal)
- @param imf
-    [Output] The decomposed intrinsic mode functions (2d matrix)
- */
 
 void eemd(int ns, float *s, float nr, int ne, int *nm, float **imf) {
     int i, m, e;

@@ -12,7 +12,7 @@ endif
 CFLAGS = -g
 
 D = $(GEODIAG_TOOLS)/eemd
-OBJECTS = $(D)/eemd_ncl_wrapper.o $(D)/eemd.o
+OBJECTS = $(D)/spline.o $(D)/eemd_ncl_wrapper.o $(D)/eemd.o
 
 VPATH = $(D)
 

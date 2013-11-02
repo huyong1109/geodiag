@@ -6,6 +6,9 @@ begin
 
     res@gsnDraw = False
     res@gsnFrame = False
+    if (.not. isatt(res, "trXMaxF")) then
+        res@trXMaxF = max(x)
+    end if
     res@tmYLTickSpacingF = 0.5
     res@xyLineThicknessF = 3.0
     res@vpWidthF = 24.0

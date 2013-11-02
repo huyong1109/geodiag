@@ -4,9 +4,7 @@
 #include <ncarg/ncl/NclDataDefs.h>
 #include <ncarg/ncl/NclBuiltIns.h>
 #include <ncarg/ncl/NclBuiltInSupport.h>
-
-extern void eemd(int ns, float *s, float nr, int ne,
-                 int *nm, float **imf);
+#include "eemd.h"
 
 NhlErrorTypes eemd_ncl_wrapper(void) {
     /* parameter 1: original signal */
