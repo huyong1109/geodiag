@@ -15,7 +15,7 @@ comments: true
 	need to cast a NCL script by themself. For the time being, users can load
 	the script as:
 	<div class="text_example">
-		load "$GEODIAG_UTILS/geodiag_plot_utils.ncl"
+		load "$GEODIAG_ROOTS/geodiag.ncl"
 	</div>
 	<h1>3.1 Plot China map</h1>
 	<p>
@@ -57,4 +57,27 @@ comments: true
 		For curious users, the internal NCL scripts can be viewed 
 		<a href="https://github.com/lasg-model/geodiag/blob/master/tools/utils/plot_utils/china_map.ncl">here</a>.
 	</p>
+    <h1>3.2 EEMD</h1>
+    <p>
+        The EEMD is a method to decompose the given signal into several
+        intrinsic modes (for more information, Google it!). The original
+        version of EEMD is written in Matlab, which is easy to use if you are
+        familiar with Matlab. But we wish to use it in NCL!
+        <b>eemd</b> is the same as:
+        <div class="text_example">
+            PI = atan(1.0)*4.0
+            x = fspan(0.0, 2.0*PI, 100)
+            s = sin(x)
+
+            <font color="red">
+            imf = eemd(s, 0.2, 1000)
+            </font>
+
+            wks = gsn_open_wks("pdf", "eemd")
+
+            <font color="red">
+            eemd_plot_imf(wks, x, imf, True) ; plot the result
+            </font>
+        </div>
+    </p>
 </p>
