@@ -62,8 +62,8 @@ comments: true
         The EEMD is a method to decompose the given signal into several
         intrinsic modes (for more information, Google it!). The original
         version of EEMD is written in Matlab, which is easy to use if you are
-        familiar with Matlab. But we wish to use it in NCL!
-        <b>eemd</b> is the same as:
+        familiar with Matlab. But we wish to use it in NCL! The usage of
+        <b>eemd</b> is kept as the original version:
         <div class="text_example">
             PI = atan(1.0)*4.0<br>
             x = fspan(0.0, 2.0*PI, 100)<br>
@@ -79,5 +79,9 @@ comments: true
             eemd_plot_imf(wks, x, imf, True) ; plot the result<br>
             </font>
         </div>
+        The code is written in C (see
+        <a href="https://github.com/lasg-model/geodiag/blob/master/tools/eemd/eemd.c">here</a>.
+        If you find any problem, you can fix it or report it
+        <a href="https://github.com/lasg-model/geodiag/issues">here</a>!
     </p>
 </p>
