@@ -65,18 +65,18 @@ comments: true
         familiar with Matlab. But we wish to use it in NCL!
         <b>eemd</b> is the same as:
         <div class="text_example">
-            PI = atan(1.0)*4.0
-            x = fspan(0.0, 2.0*PI, 100)
-            s = sin(x)
-
+            PI = atan(1.0)*4.0<br>
+            x = fspan(0.0, 2.0*PI, 100)<br>
+            s = sin(x)<br>
+            <br>
             <font color="red">
-            imf = eemd(s, 0.2, 1000)
+            imf = eemd(s, 0.2, 1000)<br>
             </font>
-
-            wks = gsn_open_wks("pdf", "eemd")
-
+            <br>
+            wks = gsn_open_wks("pdf", "eemd")<br>
+            <br>
             <font color="red">
-            eemd_plot_imf(wks, x, imf, True) ; plot the result
+            eemd_plot_imf(wks, x, imf, True) ; plot the result<br>
             </font>
         </div>
     </p>
