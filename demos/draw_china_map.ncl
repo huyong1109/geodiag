@@ -34,6 +34,7 @@ begin
     ; --------------------------------------------------------------------------
     ; attach China map on the base plot
     config = True
+    config@isUseLowResolution = True
     config@isShowProvince = False
     config@isShowSouthChinaSea = True
     config@isAddMask = True
