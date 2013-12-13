@@ -32,7 +32,7 @@ function _geodiag_()
     completed_words=""
     case "${prev_argv##*/}" in
     "geodiag")
-        completed_words="update"
+        completed_words="list update"
         ;;
     esac
     COMPREPLY=($(compgen -W "$completed_words" -- $curr_argv))

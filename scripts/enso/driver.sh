@@ -1,6 +1,6 @@
 #!/bin/bash
 
-source $GEODIAG_ROOT/scripts/utils/geodiag_cmd_utils.sh
+source $GEODIAG_ROOT/tools/geodiag_cmd_utils.sh
 
 ENSO_ROOT=$GEODIAG_ROOT/scripts/enso
 

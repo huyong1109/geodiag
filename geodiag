@@ -6,13 +6,20 @@
 #
 # Authors:
 #
-#   Li Dong
+#   - Li Dong <dongli@lasg.iap.ac.cn>
 # ------------------------------------------------------------------------------
 
 source $GEODIAG_ROOT/tools/geodiag_cmd_utils.sh
 
 # TODO: construct a framework for handling subcommands
 case $1 in
+"list")
+    notice "Available tools:"
+    cat $GEODIAG_ROOT/tools/manifest
+    notice "Available scripts:"
+    cat $GEODIAG_ROOT/scripts/manifest
+    exit $?
+    ;;
 "update")
     # for users who are not familiar with git
     cd $GEODIAG_ROOT
