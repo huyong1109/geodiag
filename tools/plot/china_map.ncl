@@ -15,6 +15,9 @@
 ;   - config: configuration
 ;     config@isUseLowResolution: use low resolution (modified by me)
 ;     config@isShowProvince: show province boundaries or not
+;     config@isShowCity: show city boundaries or not
+;     config@cityColor: set the color of city boundaries
+;     config@cityThickness: set the thickness of city boundaries
 ;     config@isShowSouthChinaSea: show South China Sea or not
 ;     config@isAddMask: add mask to show only China region or not
 ;     config@isShowRivers: show first class rivers or not
@@ -41,6 +44,7 @@
 ;                and rivers.
 ;   2013-01-28 - Add the control on the South China Sea small map.
 ;   2013-12-10 - Add isUseLowResolution option to speed up plotting.
+;   2013-12-25 - Add city boundary plots.
 ; ------------------------------------------------------------------------------
 
 procedure plot_shapefile(wks, base_plot, attach_plot, shapefile, res)
@@ -104,6 +108,9 @@ begin
     ; set default configuration
     set_default(config, "isUseLowResolution", False)
     set_default(config, "isShowProvince", False)
+    set_default(config, "isShowCity", False)
+    set_default(config, "cityColor", "blue")
+    set_default(config, "cityThickness", 0.5)
     set_default(config, "isShowSouthChinaSea", False)
     set_default(config, "isAddMask", False)
     set_default(config, "isShowRivers", False)
@@ -117,13 +124,16 @@ begin
     ; draw china map from shapefile directly which is downloaded from:
     ;   National Fundamental Geographic Information System
     ;   http://nfgis.nsdi.gov.cn/nfgis/english/default.htm
+    if (config@isShowCity) ; when plotting city, also plot province
+        config@isShowProvince = True
+    end if
     if (config@isShowProvince) then
-        china_shp = systemfunc("echo $GEODIAG_TOOLS/data/map/bou2_4l.shp")
+        china_shp = "$GEODIAG_TOOLS/data/map/bou2_4l.shp"
     else
         if (config@isUseLowResolution) then
-            china_shp = systemfunc("echo $GEODIAG_TOOLS/data/map/bou1_4l_low.shp")
+            china_shp = "$GEODIAG_TOOLS/data/map/bou1_4l_low.shp"
         else
-            china_shp = systemfunc("echo $GEODIAG_TOOLS/data/map/bou1_4l.shp")
+            china_shp = "$GEODIAG_TOOLS/data/map/bou1_4l.shp"
         end if
     end if
     res1                    = True
@@ -135,20 +145,28 @@ begin
     ; draw rivers
     if (config@isShowRivers) then
         if (config@isUseLowResolution) then
-            river_shp = systemfunc("echo $GEODIAG_TOOLS/data/map/hyd1_4l_low.shp")
+            river_shp = "$GEODIAG_TOOLS/data/map/hyd1_4l_low.shp"
         else
-            river_shp = systemfunc("echo $GEODIAG_TOOLS/data/map/hyd1_4l.shp")
+            river_shp = "$GEODIAG_TOOLS/data/map/hyd1_4l.shp"
         end if
         res1@gsLineColor        = config@riverColor
         res1@gsLineThicknessF   = config@riverThickness
         plot_shapefile(wks, base_plot, base_plot, river_shp, res1)
     end if
 
+    ; --------------------------------------------------------------------------
+    ; draw city boundaries
+    if (config@isShowCity)
+        city_shp = "$GEODIAG_TOOLS/data/map/city.shp"
+        res1@gsLineColor = config@cityColor
+        res1@gsLineThicknessF = config@cityThickness
+        plot_shapefile(wks, base_plot, base_plot, city_shp, res1)
+    end if
 
     ; --------------------------------------------------------------------------
     ; draw mask for plotting China only
     if (config@isAddMask) then
-        mask_file = systemfunc("echo $GEODIAG_TOOLS/data/map/china_mask.nc")
+        mask_file = "$GEODIAG_TOOLS/data/map/china_mask.nc"
         f = addfile(mask_file, "r")
 
         res2                 = True
