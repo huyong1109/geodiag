@@ -12,20 +12,25 @@
 ;   - res: external plotting's resource
 ;   - wks: a workspace
 ;   - base_plot: the external plotting
-;   - config: configuration
-;     config@isUseLowResolution: use low resolution (modified by me)
-;     config@isShowProvince: show province boundaries or not
-;     config@isShowCity: show city boundaries or not
-;     config@cityColor: set the color of city boundaries
-;     config@cityThickness: set the thickness of city boundaries
-;     config@isShowSouthChinaSea: show South China Sea or not
-;     config@isAddMask: add mask to show only China region or not
-;     config@isShowRivers: show first class rivers or not
-;     config@boundaryColor: set the color of boundary
-;     config@boundaryThickness: set the thickness of boundary
-;     config@riverColor: set the color of rivers
-;     config@riverThickness: set the thickness of rivers
-;     config@southChinaSeaMapWidth: set the width of the small map
+;
+; Configuration:
+;
+;   You can configure the China map plotting by using the following GEODIAG
+;   resources before invoking 'setup_china_map':
+;
+;     - isUseLowResolution: use low resolution (modified by me)
+;     - isShowProvince: show province boundaries or not
+;     - isShowCity: show city boundaries or not
+;     - cityColor: set the color of city boundaries
+;     - cityThickness: set the thickness of city boundaries
+;     - isShowSouthChinaSea: show South China Sea or not
+;     - isAddMask: add mask to show only China region or not
+;     - isShowRivers: show first class rivers or not
+;     - boundaryColor: set the color of boundary
+;     - boundaryThickness: set the thickness of boundary
+;     - riverColor: set the color of rivers
+;     - riverThickness: set the thickness of rivers
+;     - southChinaSeaMapWidth: set the width of the small map
 ;
 ; Authors:
 ;
@@ -45,6 +50,7 @@
 ;   2013-01-28 - Add the control on the South China Sea small map.
 ;   2013-12-10 - Add isUseLowResolution option to speed up plotting.
 ;   2013-12-25 - Add city boundary plots.
+;   2014-01-05 - Change to use NCL mask.
 ; ------------------------------------------------------------------------------
 
 procedure plot_shapefile(wks, base_plot, attach_plot, shapefile, res)
@@ -82,43 +88,59 @@ begin
 
 end
 
+config = True ; global internal configuration
+
 procedure setup_china_map(res)
 begin
 
-    res                         = True
-    res@gsnMaximize             = True
-    res@gsnDraw                 = False
-    res@gsnFrame                = False
-    res@mpMinLatF               = 17.
-    res@mpMaxLatF               = 55.
-    res@mpMinLonF               = 72.
-    res@mpMaxLonF               = 136.
-    res@mpOutlineOn             = False
-    res@mpLandFillColor         = "white"
-    res@mpOceanFillColor        = "white"
-    res@mpInlandWaterFillColor  = "white"
+    res          = True
+    res@gsnDraw  = False
+    res@gsnFrame = False
+
+    ; --------------------------------------------------------------------------
+    ; transfer configuration for GEODIAG from res to internal config variable
+    transfer_attribute(res, config, "isUseLowResolution", False)
+    transfer_attribute(res, config, "isShowProvince", False)
+    transfer_attribute(res, config, "isShowCity", False)
+    transfer_attribute(res, config, "cityColor", "blue")
+    transfer_attribute(res, config, "cityThickness", 0.5)
+    transfer_attribute(res, config, "isShowSouthChinaSea", False)
+    transfer_attribute(res, config, "isAddMask", False)
+    transfer_attribute(res, config, "isShowRivers", False)
+    transfer_attribute(res, config, "riverColor", "black")
+    transfer_attribute(res, config, "riverThickness", 0.5)
+    transfer_attribute(res, config, "boundaryColor", "black")
+    transfer_attribute(res, config, "boundaryThickness", 0.5)
+    transfer_attribute(res, config, "southChinaSeaMapWidth", 0.17)
+
+    ; --------------------------------------------------------------------------
+    ; set default NCL resources if user does not provide them
+    set_default(res, "gsnMaximize", True)
+    set_default(res, "mpMinLatF", 17.0)
+    set_default(res, "mpMaxLatF", 55.0)
+    set_default(res, "mpMinLonF", 72.0)
+    set_default(res, "mpMaxLonF", 136.0)
+    set_default(res, "mpOutlineOn", False)
+    set_default(res, "mpLandFillColor", "white")
+    set_default(res, "mpOceanFillColor", "white")
+    set_default(res, "mpInlandWaterFillColor", "white")
+
+    if (config@isAddMask) then
+        ; suggested in http://bbs.06climate.com/forum.php?mod=viewthread&tid=11797&extra=page%3D1&page=1
+        res@cnFillDrawOrder = "PreDraw"
+        res@mpDataBaseVersion = "MediumRes"
+        res@mpDataSetName = "Earth..4"
+        res@mpAreaMaskingOn = True
+        res@mpMaskAreaSpecifiers = (/"China","Taiwan", \
+              "Disputed area between India and China", \
+              "India:Arunachal Pradesh"/)
+    end if
 
 end
 
-procedure attach_china_map(wks, base_plot, config)
+procedure attach_china_map(wks, base_plot)
 local res1, res2, res3, f, small_map, map
 begin
-
-    ; ------------------------------------------------------------------------
-    ; set default configuration
-    set_default(config, "isUseLowResolution", False)
-    set_default(config, "isShowProvince", False)
-    set_default(config, "isShowCity", False)
-    set_default(config, "cityColor", "blue")
-    set_default(config, "cityThickness", 0.5)
-    set_default(config, "isShowSouthChinaSea", False)
-    set_default(config, "isAddMask", False)
-    set_default(config, "isShowRivers", False)
-    set_default(config, "riverColor", "black")
-    set_default(config, "riverThickness", 0.5)
-    set_default(config, "boundaryColor", "black")
-    set_default(config, "boundaryThickness", 0.5)
-    set_default(config, "southChinaSeaMapWidth", 0.17)
 
     ; ------------------------------------------------------------------------
     ; draw china map from shapefile directly which is downloaded from:
@@ -161,31 +183,6 @@ begin
         res1@gsLineColor = config@cityColor
         res1@gsLineThicknessF = config@cityThickness
         plot_shapefile(wks, base_plot, base_plot, city_shp, res1)
-    end if
-
-    ; --------------------------------------------------------------------------
-    ; draw mask for plotting China only
-    if (config@isAddMask) then
-        mask_file = "$GEODIAG_TOOLS/data/map/china_mask.nc"
-        f = addfile(mask_file, "r")
-
-        res2                 = True
-        res2@gsnDraw         = False
-        res2@gsnFrame        = False
-        res2@cnFillOn        = True
-        res2@cnLinesOn       = False
-        res2@cnLineLabelsOn  = False
-        res2@lbLabelBarOn    = False
-        res2@cnInfoLabelOn   = False
-        res2@cnFillColors    = (/"white","white","transparent","transparent"/)
-        res2@cnLevelSelectionMode = "ManualLevels"
-        res2@cnMinLevelValF  = 0.0
-        res2@cnMaxLevelValF  = 1.0
-        res2@cnLevelSpacingF = 0.5
-
-        base_plot@mask_plot = gsn_csm_contour(wks, f->china_mask(lat|:,lon|:), res2)
-
-        overlay(base_plot, base_plot@mask_plot)
     end if
 
     ; --------------------------------------------------------------------------

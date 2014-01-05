@@ -17,6 +17,18 @@ begin
 
 end
 
+procedure transfer_attribute(res_from, res_to, att_name, default)
+begin
+
+    if (isatt(res_from, att_name)) then
+        res_to@$att_name$ = res_from@$att_name$
+        delete(res_from@$att_name$)
+    else
+        res_to@$att_name$ = default
+    end if
+
+end
+
 procedure setup_map(projection, res)
 begin
 

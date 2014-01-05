@@ -9,6 +9,17 @@ begin
     wks = gsn_open_wks("pdf", "china_map")
 
     res = True
+    res@isUseLowResolution = True
+    res@isShowProvince = False
+    res@isShowCity = False
+    res@cityThickness = 2.0
+    res@isShowSouthChinaSea = True
+    res@isAddMask = True
+    res@isShowRivers = True
+    res@riverColor = "red"
+    res@riverThickness = 1.0
+    res@boundaryThickness = 2.0
+    res@southChinaSeaMapWidth = 0.1
     setup_china_map(res) ; <--- set the resource for China map
 
     ; --------------------------------------------------------------------------
@@ -33,18 +44,7 @@ begin
 
     ; --------------------------------------------------------------------------
     ; attach China map on the base plot
-    config = True
-    config@isUseLowResolution = True
-    config@isShowProvince = True
-    config@isShowCity = True
-    config@isShowSouthChinaSea = True
-    config@isAddMask = True
-    config@isShowRivers = True
-    config@riverColor = "red"
-    config@riverThickness = 1.0
-    config@boundaryThickness = 2.0
-    config@southChinaSeaMapWidth = 0.1
-    attach_china_map(wks, plot, config)
+    attach_china_map(wks, plot)
     draw(plot)
 
     frame(wks)
