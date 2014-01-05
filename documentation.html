@@ -22,31 +22,31 @@ comments: true
 		The calling pattern is as the following example:
 		<div class="text_example">
 			res = True<br>
+			res@<font color="red">isShowProvince</font> = False              ; ---------- #1<br>
+			res@<font color="red">isShowSouthChinaSea</font> = True<br>
+			res@<font color="red">isAddMask</font> = True<br>
+			res@<font color="red">isShowRivers</font> = True<br>
+			res@<font color="red">riverColor</font> = "black"<br>
+			res@<font color="red">riverThickness</font> = 0.5<br>
+			res@<font color="red">boundaryColor</font> = "black"<br>
+			res@<font color="red">boundaryThickness</font> = 0.5<br>
 			<font color="red">
-			setup_china_map(res)                    ; ---------- #1
+			setup_china_map(res)                    ; ---------- #2
 			</font><br>
 			... ; other plotting resources<br>
 			plot = ... ; plot the figure<br>
 			<font color="red">
-			config = True<br>
-			config@isShowProvince = False           ; ---------- #2<br>
-			config@isShowSouthChinaSea = True<br>
-			config@isAddMask = True<br>
-			config@isShowRivers = True<br>
-			config@riverColor = "black"<br>
-			config@riverThickness = 0.5<br>
-			config@boundaryColor = "black"<br>
-			config@boundaryThickness = 0.5<br>
 			attach_china_map(wks, plot, config)     ; ---------- #3<br>
 			draw(plot) ; DO NOT FORGET THIS STEP!!! ; ---------- #4
 			</font>
 		</div>
-		The #1 statement will set the range of lat-lon coordinates, and some
-		other basic setup of a map. Some configurations can be set like #2
-		statement. The #3 statement will attach the China map onto the base
-		plot, which can be just a map or any other plot like contours. Finally,
-		do not forget to draw the base plot! The figure without real content is
-		as:<br>
+        Some resources (only valid to GEODIAG, full list can be found <a
+        href="https://github.com/lasg-model/geodiag/blob/master/tools/plot/china_map.ncl#L16">here</a>)
+        can be set like #1 statement.  The #2 statement will set the range of
+        lat-lon coordinates, and some other basic setup of a map.  The #3
+        statement will attach the china map onto the base plot, which can be
+        just a map or any other plot like contours. Finally, do not forget to
+        draw the base plot! The figure without real content is as:<br>
 		<img src="assets/pictures/china_map.png" alt="China map"
 		width="600"/><br>
 		<div class="notice">
