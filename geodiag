@@ -9,25 +9,25 @@
 #   - Li Dong <dongli@lasg.iap.ac.cn>
 # ------------------------------------------------------------------------------
 
-source $GEODIAG_ROOT/tools/geodiag_cmd_utils.sh
+source $GEODIAG_ROOT/tools/bash_utils.sh
 
 function geodiag_help
 {
     notice "GEODIAG command usage:"
     echo
-    echo -e "- geodiag list"
+    echo -e "- geodiag $(add_color list 'bold')"
     echo
     echo -e "\tlist the available packages and tools"
     echo
-    echo -e "- geodiag update"
+    echo -e "- geodiag $(add_color update 'bold')"
     echo
     echo -e "\tupdate GEODIAG"
     echo
-    echo -e "- geodiag help [<package>]"
+    echo -e "- geodiag $(add_color help 'bold') [<package>]"
     echo
     echo -e "\tprint help of GEODIAG or individual pacage"
     echo
-    echo -e "- geodiag run <package> [<options>]"
+    echo -e "- geodiag $(add_color run 'bold') <package> [<options>]"
     echo
     echo -e "\trun diagnosis package with given options"
 }
@@ -39,7 +39,7 @@ function check_package_validity
     for function_suffix in $necessary_function_suffixs; do
         function=${package}${function_suffix}
         if ! type -t $function > /dev/null; then
-            report_warning "Package \"$package\" does not comply with the standard! Bash function \"$function\" is missed!"
+            report_error "Package \"$(add_color $package "magenta bold")\" does not comply with the standard! Bash function \"$(add_color $function "blue bold")\" is missed!"
         fi
     done
 }
