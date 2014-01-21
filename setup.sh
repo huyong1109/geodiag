@@ -20,8 +20,8 @@ source $GEODIAG_TOOLS/build.sh
 export NCL_DEF_LIB_DIR=$GEODIAG_TOOLS/shared
 
 # source other setup.sh scripts
-for setup_script in $(find $GEODIAG_ROOT/scripts -name setup.sh); do
-    source $setup_script
+for package_setup in $(find $GEODIAG_ROOT/packages -name setup.sh); do
+    source $package_setup
 done
 
 # command line completion
@@ -32,7 +32,7 @@ function _geodiag_()
     completed_words=""
     case "${prev_argv##*/}" in
     "geodiag")
-        completed_words="list update"
+        completed_words="list update help run"
         ;;
     esac
     COMPREPLY=($(compgen -W "$completed_words" -- $curr_argv))

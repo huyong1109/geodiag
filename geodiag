@@ -11,13 +11,63 @@
 
 source $GEODIAG_ROOT/tools/geodiag_cmd_utils.sh
 
+function geodiag_help
+{
+    notice "GEODIAG command usage:"
+    echo
+    echo -e "- geodiag list"
+    echo
+    echo -e "\tlist the available packages and tools"
+    echo
+    echo -e "- geodiag update"
+    echo
+    echo -e "\tupdate GEODIAG"
+    echo
+    echo -e "- geodiag help [<package>]"
+    echo
+    echo -e "\tprint help of GEODIAG or individual pacage"
+    echo
+    echo -e "- geodiag run <package> [<options>]"
+    echo
+    echo -e "\trun diagnosis package with given options"
+}
+
+function check_package_validity
+{
+    package=$1
+    necessary_function_suffixs="_help _run"
+    for function_suffix in $necessary_function_suffixs; do
+        function=${package}${function_suffix}
+        if ! type -t $function > /dev/null; then
+            report_warning "Package \"$package\" does not comply with the standard! Bash function \"$function\" is missed!"
+        fi
+    done
+}
+
+function check_package_existence
+{
+    package=$1
+    if [[ ! -d $GEODIAG_ROOT/packages/$package ]]; then
+        report_error "Package \"$package\" does not exist!"
+    fi
+}
+
+# source the driver for each package
+for driver in $(find $GEODIAG_ROOT/packages -name "driver.sh"); do
+    package=$(basename $(dirname $driver))
+    source $driver
+    check_package_validity $package
+done
+
 # TODO: construct a framework for handling subcommands
 case $1 in
 "list")
     notice "Available tools:"
     cat $GEODIAG_ROOT/tools/manifest
-    notice "Available scripts:"
-    cat $GEODIAG_ROOT/scripts/manifest
+    notice "Available packages:"
+    for manifest in $(find "$GEODIAG_ROOT/packages" -name manifest); do
+        echo "  $(cat $manifest)"
+    done
     exit $?
     ;;
 "update")
@@ -26,22 +76,32 @@ case $1 in
     if [ ! -d .git ]; then
         report_error "This copy of GEODIAG is not gained in git way, so update can only be got from https://github.com/lasg-model/geodiag/zipball/master manually."
     fi
+    old_sha1=$(git rev-parse HEAD)
     git pull
+    new_sha1=$(git rev-parse HEAD)
+    if [[ $old_sha1 != $new_sha1 ]]; then
+        # show the logs of new commits
+        git show --name-only $old_sha1^1 $new_sha1
+    fi
     exit $?
     ;;
+"help")
+    if (( $# == 1 )); then
+        geodiag_help
+    elif (( $# == 2 )); then
+        package=$2
+        check_package_existence $package
+        ${package}_help
+    fi
+    ;;
+"run")
+    if (( $# != 2 )); then
+        geodiag_help
+        report_error "Wrong usage!"
+    else
+        package=$2
+        check_package_existence $package
+        ${package}_run
+    fi
+    ;;
 esac
-
-# source the driver for each phenomenon
-for driver in $(find $GEODIAG_ROOT/scripts -name "driver.sh"); do
-    source $driver
-done
-
-notice "Which phenomenon do you want to diagnose?"
-read -p "[phenomenon] > " phenon
-
-# call corresponding driver
-res=$(find $GEODIAG_ROOT -type d -name "$phenon")
-if [[ "$res" == ""  ]] ; then
-    report_error "Unknown phenomenon!"
-fi
-${phenon}_driver

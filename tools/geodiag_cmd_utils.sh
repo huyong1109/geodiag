@@ -3,19 +3,19 @@
 function notice
 {
     message=$1
-    echo "[Notice]: $message"
+    echo -e "[Notice]: $message"
 }
 
 function report_warning
 {
     message=$1
-    echo "[Warning]: $message"
+    echo -e "[Warning]: $message"
 }
 
 function report_error
 {
     message=$1
-    echo "[Error]: $message"
+    echo -e "[Error]: $message"
     exit
 }
 
