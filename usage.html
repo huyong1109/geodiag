@@ -14,6 +14,25 @@ comments: true
 	</div>
 	The subcommand update works <b>only if</b> the GEODIAG was got by using git!
 </p>
+<h1>Run Diagnostics Packages</h1>
 <p>
-	<div class="notice">Under construction</div>
+    GEODIAG is enriched with plenty (at least should be) of diagnostics
+    packages (e.g. MJO). You can check out what packages are available by:
+    <div class="command_example">
+        $ geodiag list
+    </div>
+    These packages can help the researchers get the results quickly and easily,
+    and can be used as the post-processing of models. All you need to do is
+    calling one or several commands as following (of course, you need to
+    prepare the data!):
+    <div class="command_example">
+        $ geodiag run &ltpackage&gt [&ltpackage options&gt]
+    </div>
+    You can get the necessary options specific to a package by:
+    <div class="command_example">
+        $ geodiag help &ltpackage&gt
+    </div>
+</p>
+<p>
+	<div class="notice">Under heavy construction</div>
 </p>
