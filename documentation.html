@@ -3,85 +3,129 @@ layout: default
 title: GEODIAG's Home
 comments: true
 ---
-<h1>1. Introduction</h1>
-<p>
-	GEODIAG can be used as a CUI/GUI application by calling the corresponding
-	interface, or be used as a NCL script library by loading the scripts.
-</p>
-<h1>2. CUI usage</h1>
-<h1>3. Library usage</h1>
-<p>
-	Several useful NCL functions or procedures are written for researchers who
-	need to cast a NCL script by themself. For the time being, users can load
-	the script as:
-	<div class="text_example">
-		load "$GEODIAG_ROOT/geodiag.ncl"
-	</div>
-	<h1>3.1 Plot China map</h1>
+<div class="section">
+	<h1>1. Introduction</h1>
 	<p>
-		The calling pattern is as the following example:
-		<div class="text_example">
-			res = True<br>
-			res@<font color="red">isShowProvince</font> = False              ; ---------- #1<br>
-			res@<font color="red">isShowSouthChinaSea</font> = True<br>
-			res@<font color="red">isAddMask</font> = True<br>
-			res@<font color="red">isShowRivers</font> = True<br>
-			res@<font color="red">riverColor</font> = "black"<br>
-			res@<font color="red">riverThickness</font> = 0.5<br>
-			res@<font color="red">boundaryColor</font> = "black"<br>
-			res@<font color="red">boundaryThickness</font> = 0.5<br>
-			<font color="red">
-			setup_china_map(res)                    ; ---------- #2
-			</font><br>
-			... ; other plotting resources<br>
-			plot = ... ; plot the figure<br>
-			<font color="red">
-			attach_china_map(wks, plot)     ; ---------- #3<br>
-			draw(plot) ; DO NOT FORGET THIS STEP!!! ; ---------- #4
-			</font>
-		</div>
-        Some resources (only valid to GEODIAG, full list can be found <a
-        href="https://github.com/lasg-model/geodiag/blob/master/tools/plot/china_map.ncl#L16">here</a>)
-        can be set like #1 statement.  The #2 statement will set the range of
-        lat-lon coordinates, and some other basic setup of a map.  The #3
-        statement will attach the china map onto the base plot, which can be
-        just a map or any other plot like contours. Finally, do not forget to
-        draw the base plot! The figure without real content is as:<br>
-		<img src="assets/pictures/china_map.png" alt="China map"
-		width="600"/><br>
-		<div class="notice">
-			For the time being, the small map of South China Sea will not be
-			filled by any content (e.g., contours). This can be improved by any
-			one who want to contribute!
-		</div>
-		For curious users, the internal NCL scripts can be viewed 
-		<a href="https://github.com/lasg-model/geodiag/blob/master/tools/utils/plot_utils/china_map.ncl">here</a>.
+        GEODIAG can be used as a CUI application by calling the corresponding
+        interface, or be used as a NCL script library by loading the scripts.
 	</p>
-    <h1>3.2 EEMD</h1>
-    <p>
-        The EEMD is a method to decompose the given signal into several
-        intrinsic modes (for more information, Google it!). The original
-        version of EEMD is written in Matlab, which is easy to use if you are
-        familiar with Matlab. But we wish to use it in NCL! The usage of
-        <b>eemd</b> is kept as the original version:
-        <div class="text_example">
-            PI = atan(1.0)*4.0<br>
-            x = fspan(0.0, 2.0*PI, 100)<br>
-            s = sin(x)<br>
-            <br>
-            <font color="red">
-            imf = eemd(s, 0.2, 1000)<br>
-            </font>
-            <br>
-            wks = gsn_open_wks("pdf", "eemd")<br>
-            <br>
-            <font color="red">
-            eemd_plot_imf(wks, x, imf, True) ; plot the result<br>
-            </font>
-        </div>
-        The code is written in C (see
-        <a href="https://github.com/lasg-model/geodiag/blob/master/tools/eemd/eemd.c">here</a>.
-        If you find any problem, you can fix it or report it
-        <a href="https://github.com/lasg-model/geodiag/issues">here</a>!
-    </p>
-</p>
+</div>
+
+<div class="section">
+	<h1>2. CUI usage</h1>
+	<p>
+		<h1>2.1 Update GEODIAG</h1>
+		<p>
+            GEODIAG is version controlled by <b>git</b>. Because it will be
+            continuously developed by the community members, update will be
+            very frequent. Thus, in order to make the update process
+            transparent to the users who are not familiar with <b>git</b>, the
+            following command has been cast:
+			<div class="command_example">
+				$ geodiag update
+			</div>
+            The subcommand update works <b>only if</b> the GEODIAG was got by
+            using git!
+		</p>
+		<h1>2.2 Run diagnostics packages</h1>
+		<p>
+            GEODIAG is enriched with plenty (at least should be) of diagnostics
+            packages (e.g. MJO). You can check out what packages are available
+            by:
+		    <div class="command_example">
+		        $ geodiag list
+		    </div>
+            These packages can help the researchers get the results quickly and
+            easily, and can be used as the post-processing of models. All you
+            need to do is calling one or several commands as following (of
+            course, you need to prepare the data!):
+		    <div class="command_example">
+		        $ geodiag run &ltpackage&gt [&ltpackage options&gt]
+		    </div>
+		    You can get the necessary options specific to a package by:
+		    <div class="command_example">
+		        $ geodiag help &ltpackage&gt
+		    </div>
+		</p>
+	</p>
+</div>
+
+<div class="section">
+	<h1>3. Library usage</h1>
+	<p>
+        Several useful NCL functions or procedures are written for researchers
+        who need to cast a NCL script by themself. For the time being, users
+        can load the script as:
+		<div class="text_example">
+			load "$GEODIAG_ROOT/geodiag.ncl"
+		</div>
+		<h1>3.1 Plot China map</h1>
+		<p>
+			The calling pattern is as the following example:
+			<div class="text_example">
+				res = True<br>
+				res@<font color="red">isShowProvince</font> = False              ; ---------- #1<br>
+				res@<font color="red">isShowSouthChinaSea</font> = True<br>
+				res@<font color="red">isAddMask</font> = True<br>
+				res@<font color="red">isShowRivers</font> = True<br>
+				res@<font color="red">riverColor</font> = "black"<br>
+				res@<font color="red">riverThickness</font> = 0.5<br>
+				res@<font color="red">boundaryColor</font> = "black"<br>
+				res@<font color="red">boundaryThickness</font> = 0.5<br>
+				<font color="red">
+				setup_china_map(res)                    ; ---------- #2
+				</font><br>
+				... ; other plotting resources<br>
+				plot = ... ; plot the figure<br>
+				<font color="red">
+				attach_china_map(wks, plot)     ; ---------- #3<br>
+				draw(plot) ; DO NOT FORGET THIS STEP!!! ; ---------- #4
+				</font>
+			</div>
+            Some resources (only valid to GEODIAG, full list can be found <a
+            href="https://github.com/lasg-model/geodiag/blob/master/tools/plot/china_map.ncl#L16">here</a>)
+            can be set like #1 statement.  The #2 statement will set the range
+            of lat-lon coordinates, and some other basic setup of a map.  The
+            #3 statement will attach the china map onto the base plot, which
+            can be just a map or any other plot like contours. Finally, do not
+            forget to draw the base plot! The figure without real content is
+            as:<br>
+			<img src="assets/pictures/china_map.png" alt="China map"
+			width="600"/><br>
+			<div class="notice">
+                For the time being, the small map of South China Sea will not
+                be filled by any content (e.g., contours). This can be improved
+                by any one who want to contribute!
+			</div>
+			For curious users, the internal NCL scripts can be viewed 
+			<a href="https://github.com/lasg-model/geodiag/blob/master/tools/utils/plot_utils/china_map.ncl">here</a>.
+		</p>
+	    <h1>3.2 EEMD</h1>
+	    <p>
+            The EEMD is a method to decompose the given signal into several
+            intrinsic modes (for more information, Google it!). The original
+            version of EEMD is written in Matlab, which is easy to use if you
+            are familiar with Matlab. But we wish to use it in NCL! The usage
+            of <b>eemd</b> is kept as the original version:
+	        <div class="text_example">
+	            PI = atan(1.0)*4.0<br>
+	            x = fspan(0.0, 2.0*PI, 100)<br>
+	            s = sin(x)<br>
+	            <br>
+	            <font color="red">
+	            imf = eemd(s, 0.2, 1000)<br>
+	            </font>
+	            <br>
+	            wks = gsn_open_wks("pdf", "eemd")<br>
+	            <br>
+	            <font color="red">
+	            eemd_plot_imf(wks, x, imf, True) ; plot the result<br>
+	            </font>
+	        </div>
+	        The code is written in C (see
+	        <a href="https://github.com/lasg-model/geodiag/blob/master/tools/eemd/eemd.c">here</a>.
+	        If you find any problem, you can fix it or report it
+	        <a href="https://github.com/lasg-model/geodiag/issues">here</a>!
+	    </p>
+	</p>
+</div>
