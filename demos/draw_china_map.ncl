@@ -24,6 +24,7 @@ begin
 
     ; --------------------------------------------------------------------------
     ; draw any data you want here
+    ;data_file = "tas_amip_jja.nc"
     if (isdefined("data_file")) then
         ; TODO: modify the following for your need
         f = addfile(data_file, "r")
@@ -34,10 +35,7 @@ begin
         res@lbLabelBarOn    = False
         res@cnLineLabelsOn  = False
 
-        var_names = get_file_var_names(f)
-        print(var_names)
-
-        plot = gsn_csm_contour_map(wks, f->$var_names(12)$(0,:,:), res)
+        plot = gsn_csm_contour_map(wks, f->tas(0,:,:), res)
     else
         plot = gsn_csm_map(wks, res)
     end if

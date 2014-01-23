@@ -23,7 +23,7 @@ Usage
 
 In **GEODIAG**, the calling of each package is through the calling of the main command interface as:
 
-      $ ./geodiag run <package> [<options>]
+      $ geodiag run <package> [<options>]
 
 where `<package>` is a suite of scripts, and `<options>` are necessary options for the running of this package if have.
 

@@ -10,7 +10,8 @@
 #   Li Dong
 # ------------------------------------------------------------------------------
 
-export GEODIAG_ROOT=$(dirname $BASH_ARGV)
+export GEODIAG_ROOT=$(cd $(dirname $BASH_ARGV) && pwd)
+export GEODIAG_PACKAGES=$GEODIAG_ROOT/packages
 export GEODIAG_TOOLS=$GEODIAG_ROOT/tools
 export PATH=$PATH:$GEODIAG_ROOT
 
@@ -20,7 +21,7 @@ source $GEODIAG_TOOLS/build.sh
 export NCL_DEF_LIB_DIR=$GEODIAG_TOOLS/shared
 
 # source other setup.sh scripts
-for package_setup in $(find $GEODIAG_ROOT/packages -name setup.sh); do
+for package_setup in $(find $GEODIAG_PACKAGES -name setup.sh); do
     source $package_setup
 done
 

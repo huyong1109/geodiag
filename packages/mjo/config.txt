@@ -1,0 +1,5 @@
+model_data_root     =   ./model_data
+model_data_pattern  =   gamil_benchmark.gamil.h1.*.nc
+model_data_list     =   U200 U850 FLUTOA
+internal_data_map   =   FLUTOA->OLR
+output_directory    =   ./result

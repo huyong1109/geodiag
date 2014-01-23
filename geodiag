@@ -30,6 +30,7 @@ function geodiag_help
     echo -e "- geodiag $(add_color run 'bold') <package> [<options>]"
     echo
     echo -e "\trun diagnosis package with given options"
+    echo
 }
 
 function check_package_validity
@@ -95,13 +96,13 @@ case $1 in
     fi
     ;;
 "run")
-    if (( $# != 2 )); then
+    if (( $# < 2 )); then
         geodiag_help
         report_error "Wrong usage!"
     else
         package=$2
         check_package_existence $package
-        ${package}_run
+        ${package}_run ${*:3}
     fi
     ;;
 esac

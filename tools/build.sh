@@ -11,4 +11,4 @@ for DIR in $DIRS; do
         echo "[Notice]: Geodiag: $(basename $DIR) has been built."
     fi
 done
-cd ~
+cd - > /dev/null

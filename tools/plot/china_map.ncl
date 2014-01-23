@@ -150,12 +150,12 @@ begin
         config@isShowProvince = True
     end if
     if (config@isShowProvince) then
-        china_shp = "$GEODIAG_TOOLS/data/map/bou2_4l.shp"
+        china_shp = "$GEODIAG_ROOT/data/map/bou2_4l.shp"
     else
         if (config@isUseLowResolution) then
-            china_shp = "$GEODIAG_TOOLS/data/map/bou1_4l_low.shp"
+            china_shp = "$GEODIAG_ROOT/data/map/bou1_4l_low.shp"
         else
-            china_shp = "$GEODIAG_TOOLS/data/map/bou1_4l.shp"
+            china_shp = "$GEODIAG_ROOT/data/map/bou1_4l.shp"
         end if
     end if
     res1                    = True
@@ -167,9 +167,9 @@ begin
     ; draw rivers
     if (config@isShowRivers) then
         if (config@isUseLowResolution) then
-            river_shp = "$GEODIAG_TOOLS/data/map/hyd1_4l_low.shp"
+            river_shp = "$GEODIAG_ROOT/data/map/hyd1_4l_low.shp"
         else
-            river_shp = "$GEODIAG_TOOLS/data/map/hyd1_4l.shp"
+            river_shp = "$GEODIAG_ROOT/data/map/hyd1_4l.shp"
         end if
         res1@gsLineColor        = config@riverColor
         res1@gsLineThicknessF   = config@riverThickness
@@ -179,7 +179,7 @@ begin
     ; --------------------------------------------------------------------------
     ; draw city boundaries
     if (config@isShowCity)
-        city_shp = "$GEODIAG_TOOLS/data/map/city.shp"
+        city_shp = "$GEODIAG_ROOT/data/map/city.shp"
         res1@gsLineColor = config@cityColor
         res1@gsLineThicknessF = config@cityThickness
         plot_shapefile(wks, base_plot, base_plot, city_shp, res1)
