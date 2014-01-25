@@ -15,6 +15,7 @@ export GEODIAG_PACKAGES=$GEODIAG_ROOT/packages
 export GEODIAG_TOOLS=$GEODIAG_ROOT/tools
 export PATH=$PATH:$GEODIAG_ROOT
 
+source $GEODIAG_TOOLS/bash_utils.sh
 source $GEODIAG_TOOLS/build.sh
 
 # shared objects that can be loaded by NCL

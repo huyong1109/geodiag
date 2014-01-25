@@ -3,6 +3,12 @@
 trap "exit 1" TERM
 export top_pid=$$
 
+if [[ -t 1 ]]; then
+    console_redirected=false
+else
+    console_redirected=true
+fi
+
 function notice
 {
     message=$1
@@ -20,6 +26,12 @@ function report_error
     message=$1
     echo -e "[$(add_color Error "red bold")]: $message" >&2
     kill -s TERM $top_pid
+}
+
+function report_error_noexit
+{
+    message=$1
+    echo -e "[$(add_color Error "red bold")]: $message" >&2
 }
 
 function check_file_existence
@@ -47,22 +59,26 @@ function check_directory_existence
 
 function add_color
 {
-    if [[ $2 == *red* ]]; then
-        colored_message="$colored_message$(tput setaf 1)"
-    elif [[ $2 == *green* ]]; then
-        colored_message="$colored_message$(tput setaf 2)"
-    elif [[ $2 == *yellow* ]]; then
-        colored_message="$colored_message$(tput setaf 3)"
-    elif [[ $2 == *blue* ]]; then
-        colored_message="$colored_message$(tput setaf 4)"
-    elif [[ $2 == *magenta* ]]; then
-        colored_message="$colored_message$(tput setaf 5)"
+    if [[ $console_redirected == true ]]; then
+        echo -n $1
+    else
+        if [[ $2 == *red* ]]; then
+            colored_message="$colored_message$(tput setaf 1)"
+        elif [[ $2 == *green* ]]; then
+            colored_message="$colored_message$(tput setaf 2)"
+        elif [[ $2 == *yellow* ]]; then
+            colored_message="$colored_message$(tput setaf 3)"
+        elif [[ $2 == *blue* ]]; then
+            colored_message="$colored_message$(tput setaf 4)"
+        elif [[ $2 == *magenta* ]]; then
+            colored_message="$colored_message$(tput setaf 5)"
+        fi
+        if [[ $2 == *bold* ]]; then
+            colored_message="$colored_message$(tput bold)"
+        fi
+        colored_message="$colored_message$1$(tput sgr0)"
+        echo -n $colored_message
     fi
-    if [[ $2 == *bold* ]]; then
-        colored_message="$colored_message$(tput bold)"
-    fi
-    colored_message="$colored_message$1$(tput sgr0)"
-    echo -n $colored_message
 }
 
 function get_config_entry
