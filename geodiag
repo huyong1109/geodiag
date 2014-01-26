@@ -15,6 +15,10 @@ function geodiag_help
 {
     notice "GEODIAG command usage:"
     echo
+    echo -e "- geodiag $(add_color warmup 'bold')"
+    echo
+    echo -e "\tbuild necessary components and other first-time things"
+    echo
     echo -e "- geodiag $(add_color list 'bold')"
     echo
     echo -e "\tlist the available packages and tools"
@@ -62,6 +66,10 @@ done
 
 # TODO: construct a framework for handling subcommands
 case $1 in
+"warmup")
+    notice "Warm up GEODIAG."
+    source $GEODIAG_TOOLS/build.sh
+    ;;
 "list")
     notice "Available tools:"
     cat $GEODIAG_ROOT/tools/manifest

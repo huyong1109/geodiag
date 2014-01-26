@@ -16,7 +16,6 @@ export GEODIAG_TOOLS=$GEODIAG_ROOT/tools
 export PATH=$PATH:$GEODIAG_ROOT
 
 source $GEODIAG_TOOLS/bash_utils.sh
-source $GEODIAG_TOOLS/build.sh
 
 # shared objects that can be loaded by NCL
 export NCL_DEF_LIB_DIR=$GEODIAG_TOOLS/shared
@@ -34,7 +33,7 @@ function _geodiag_()
     completed_words=""
     case "${prev_argv##*/}" in
     "geodiag")
-        completed_words="list update help run"
+        completed_words="warmup list update help run"
         ;;
     esac
     COMPREPLY=($(compgen -W "$completed_words" -- $curr_argv))
