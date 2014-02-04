@@ -1,0 +1,87 @@
+\input texinfo   @c -*-texinfo-*-
+@c %**start of header
+@setfilename geodiag.info
+@settitle GEODIAG Manual version 1.0.0-rc1
+@c %**end of header
+
+@copying
+This manual is for GEODIAG, version 1.0.0-rc1.
+
+Copyright @copyright{} 2012, 2013, 2014 Li Dong.
+@end copying
+
+@titlepage
+@title GEODIAG
+@subtitle Geoscientifc Diagnostics Open Platform version 1.0.0-rc1
+@author Li Dong
+
+@c  The following two commands
+@c  start the copyright page.
+@page
+@vskip 0pt plus 1filll
+@insertcopying
+@end titlepage
+
+@c So the toc is printed at the start.
+@contents
+
+@chapter Introduction
+
+@chapter Basic usage
+
+@section Installation
+
+GEODIAG is version controlled by using @code{git} and hosted at @code{GitHub}.
+It is recommendated to obtain GEODIAG through @code{git} as
+@example
+git clone https://github.com/lasg-model/geodiag
+@end example
+@noindent
+In this way, the local copy can be updated easily by
+@example
+geodiag update
+@end example
+@noindent
+After downloading GEODIAG to @code{<geodiag-root>}, modify the
+configuration of BASH (e.g. @code{.bashrc}) as
+@example
+source <geodiag-root>/setup.sh
+@end example
+@noindent
+Then login again, you should be able to invoke the command
+@code{geodiag}.
+
+@section Library usage
+
+@section Package usage
+@anchor{Package usage}
+
+Diagnostics is organized as packages. Each package specializes
+
+@chapter Developing diagnostics package
+
+GEODIAG is designed as an open platform. A @strong{framework} for writing
+diagnostics package is specified. When a package is written following the
+standard of this framework, it can be directly plugged into GEODIAG and readily
+used by other users. This standard does @emph{not} try to put handcuffs on
+researchers, but eliminate the unnecessary duplication of labor.
+
+@strong{BASH} script is chosen as the developing language, because almost all
+the servers provide a uniform BASH shell environment. Ruby and Python are more
+suitable for constructing the framework, but some servers does not provide them
+and most researchers are not familiar with them. From now on,
+@code{<package-name>} repesents the package name (e.g. @code{mjo}).
+
+The package is driven through @code{geodiag} command as shown in @ref{Package
+usage}. Package developers should provide a @code{driver.sh} BASH script, which
+contains @code{<package-name>_help}, @code{<package-name>_config} and
+@code{<package-name>_run} functions so that the package can be treated as a black box.
+
+@multitable @columnfractions .3 .7
+@headitem   Base function                @tab Description
+@item       @code{<package-name>_help}   @tab Print help of the package, especially the options.
+@item       @code{<package-name>_config} @tab Generate a configuration file.
+@item       @code{<package-name>_run}    @tab Run the package.
+@end multitable
+
+@bye
