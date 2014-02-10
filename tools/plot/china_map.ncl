@@ -20,6 +20,8 @@
 ;
 ;     - isUseLowResolution: use low resolution (modified by me)
 ;     - isShowProvince: show province boundaries or not
+;     - provinceColor: set the color of province boundaries
+;     - provinceThickness: set the thickness of province boundaries
 ;     - isShowCity: show city boundaries or not
 ;     - cityColor: set the color of city boundaries
 ;     - cityThickness: set the thickness of city boundaries
@@ -101,6 +103,8 @@ begin
     ; transfer configuration for GEODIAG from res to internal config variable
     transfer_attribute(res, config, "isUseLowResolution", False)
     transfer_attribute(res, config, "isShowProvince", False)
+    transfer_attribute(res, config, "provinceColor", "blue")
+    transfer_attribute(res, config, "provinceThickness", 0.5)
     transfer_attribute(res, config, "isShowCity", False)
     transfer_attribute(res, config, "cityColor", "blue")
     transfer_attribute(res, config, "cityThickness", 0.5)
@@ -146,22 +150,27 @@ begin
     ; draw china map from shapefile directly which is downloaded from:
     ;   National Fundamental Geographic Information System
     ;   http://nfgis.nsdi.gov.cn/nfgis/english/default.htm
-    if (config@isShowCity) ; when plotting city, also plot province
-        config@isShowProvince = True
-    end if
-    if (config@isShowProvince) then
-        china_shp = "$GEODIAG_ROOT/data/map/bou2_4l.shp"
+    if (config@isUseLowResolution) then
+        china_shp = "$GEODIAG_ROOT/data/map/bou1_4l_low.shp"
     else
-        if (config@isUseLowResolution) then
-            china_shp = "$GEODIAG_ROOT/data/map/bou1_4l_low.shp"
-        else
-            china_shp = "$GEODIAG_ROOT/data/map/bou1_4l.shp"
-        end if
+        china_shp = "$GEODIAG_ROOT/data/map/bou1_4l.shp"
     end if
     res1                    = True
     res1@gsLineColor        = config@boundaryColor
     res1@gsLineThicknessF   = config@boundaryThickness
     plot_shapefile(wks, base_plot, base_plot, china_shp, res1)
+
+    ; --------------------------------------------------------------------------
+    ; draw province boundaries
+    if (config@isShowCity) ; when plotting city, also plot province
+        config@isShowProvince = True
+    end if
+    if (config@isShowProvince) then
+        province_shp = "$GEODIAG_ROOT/data/map/province.shp"
+        res1@gsLineColor = config@provinceColor
+        res1@gsLineThicknessF = config@provinceThickness
+        plot_shapefile(wks, base_plot, base_plot, province_shp, res1)
+    end if
 
     ; --------------------------------------------------------------------------
     ; draw rivers
