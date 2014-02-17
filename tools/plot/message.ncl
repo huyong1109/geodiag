@@ -11,21 +11,21 @@
 procedure notice(message)
 begin
 
-    system("echo [Notice]: "+message)
+    system("echo '[Notice]: "+message+"'")
 
 end
 
 procedure report_warning(message)
 begin
 
-    system("echo [Warning]: "+message)
+    system("echo '[Warning]: "+message+"'")
 
 end
 
 procedure report_error(message)
 begin
 
-    system("echo [Error]: "+message)
+    system("echo '[Error]: "+message+"'")
     exit
 
 end

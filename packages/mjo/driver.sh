@@ -12,7 +12,7 @@ function mjo_help
 {
     notice "$(add_color mjo 'magenta bold') diagnosis package usage:"
     echo
-    echo -e "\tgeodiag $(add_color run bold) $(add_color mjo 'magenta bold') <variable map file>"
+    echo -e "\tgeodiag $(add_color run bold) $(add_color mjo 'magenta bold') <config file>"
     echo
 }
 
@@ -29,10 +29,13 @@ function mjo_run
     prepare_model_data "$model_data_root" "$model_data_pattern" \
                        "$model_data_list" "$internal_data_map" \
                        "$output_directory"
+    if [[ ! -d "$output_directory/figures" ]]; then
+        mkdir "$output_directory/figures"
+    fi
     # run level-1 diagnosis
-    run_level_1
+    run_level_1 "$output_directory"
     # run level-2 diagnosis
-    run_level_2
+    #run_level_2
     # run supplemental diagnosis
-    run_supp
+    #run_supp
 }

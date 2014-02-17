@@ -2,7 +2,7 @@ load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_code.ncl"
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_csm.ncl"
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/contributed.ncl"
 
-load "$GEODIAG_TOOLS/plot/message.ncl"
+load "$GEODIAG_ROOT/geodiag.ncl"
 
 ; ------------------------------------------------------------------------------
 ; Description:
@@ -10,7 +10,7 @@ load "$GEODIAG_TOOLS/plot/message.ncl"
 ;   This script is used to concatenate variable from one or many netcdf files
 ;   and keep meta data into a single file.
 ;
-;   For the time being, it is called in commond line as:
+;   For the time being, it is called in command line as:
 ;
 ;       ncl cat_var.ncl 'datasets="..."' 'var="..."' 'output="..."'
 ;                       ['var_alias="..."'] [freq=...]
@@ -27,15 +27,9 @@ load "$GEODIAG_TOOLS/plot/message.ncl"
 
 begin
 
-    if (.not. isdefined("datasets")) then
-        report_error("Argument datasets is not presented!")
-    end if
-
-    if (.not. isdefined("var")) then
-        report_error("Argument var is not presented!")
-    else
-        var_input = var
-    end if
+    check_cmd_arg("datasets")
+    check_cmd_arg("var")
+    var_input = var
 
     ; user can rename the variable
     if (isdefined("var_alias")) then
@@ -105,14 +99,18 @@ begin
         dim_var_type = getfilevartypes(fin, var_dim_names(i))
         filevardef(fout, var_dim_names(i), dim_var_type, var_dim_names(i))
         filevarattdef(fout, var_dim_names(i), fin->$var_dim_names(i)$)
-        if (var_dim_names(i) .ne. "time") then
-            fout->$var_dim_names(i)$ = (/fin->$var_dim_names(i)$/)
-        end if
     end do
     filevardef(fout, var_output, var_type, var_dim_names)
     filevarattdef(fout, var_output, fin->$var_input$)
 
     setfileoption(fout, "DefineMode", False)
+
+    ; set space coordinate variables
+    do i = 0, dimsizes(var_dim_sizes)-1
+        if (var_dim_names(i) .ne. "time") then
+            fout->$var_dim_names(i)$ = (/fin->$var_dim_names(i)$/)
+        end if
+    end do
 
     ; set time coordinate variable
     time = new(num_time, getfilevartypes(fin, "time"))

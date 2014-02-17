@@ -12,19 +12,19 @@ fi
 function notice
 {
     message=$1
-    echo -e "[$(add_color Notice "green bold")]: $message"
+    echo "[$(add_color Notice "green bold")]: $message"
 }
 
 function report_warning
 {
     message=$1
-    echo -e "[$(add_color Warning "yellow bold")]: $message"
+    echo "[$(add_color Warning "yellow bold")]: $message"
 }
 
 function report_error
 {
     message=$1
-    echo -e "[$(add_color Error "red bold")]: $message" >&2
+    echo "[$(add_color Error "red bold")]: $message" >&2
     kill -s TERM $top_pid
 }
 
@@ -91,5 +91,12 @@ function get_config_entry
     fi
     entry_value=$(echo $tmp | cut -d '=' -f 2)
     echo ${entry_value/^ */}
+}
+
+function mute_ncl
+{
+    ncl_cmd=$*
+    eval ncl $ncl_cmd | grep -v "^ \(Copyright\|University Corporation for Atmospheric Research\|NCAR Command Language Version\|The use of this software is governed by a License Agreement\|See http://www.ncl.ucar.edu/ for more details\)"
+    #eval $ncl_cmd | grep '^\[.*\]:'
 }
 
