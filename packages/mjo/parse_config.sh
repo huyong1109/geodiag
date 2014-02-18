@@ -14,6 +14,19 @@ function parse_config
     internal_data_map=$(get_config_entry $config_file "internal_data_map")
     notice "internal_data_map is \"$internal_data_map\"."
     output_directory=$(get_config_entry $config_file "output_directory")
-    check_directory_existence "$output_directory"
-    notice "output_directory is \"$output_directory\"."
+    if [[ -d "$output_directory" ]]; then
+        warning "Output directory \"$output_directory\" exists. Override it (y/n)?"
+        ans=$(get_answer)
+        if [[ "$ans" == "y" ]]; then
+            rm -r "$output_directory/*"
+            notice "Override \"$output_directory\"."
+        elif [[ "$ans" == "n" ]]; then
+            report_error "Check that directory and go back"
+        else
+            report_error "Unknown operation!"
+        fi
+    else
+        notice "Create output directory \"$output_directory\"."
+        mkdir "$output_directory"
+    fi
 }

@@ -4,12 +4,19 @@ function run_level_1
 {
     notice "Run $(add_color level-1 'red bold') $(add_color mjo 'magenta bold') diagnostics."
     output_directory=$1
-    # calculate variance of unfiltered data
-    calc_data_variance "$output_directory"
-    plot_data_variance "$output_directory"
+    # calculate variance
+    calc_variance "$output_directory"
+    plot_variance "$output_directory"
+    plot_variance_ratio "$output_directory"
+    # calculate region mean
+    calc_region_mean "$output_directory"
+    plot_region_mean "$output_directory"
+    # calculate time spectra
+    calc_time_spectra "$output_directory"
+    plot_time_spectra "$output_directory"
 }
 
-function calc_data_variance
+function calc_variance
 {
     output_directory=$1
     data_dir="$output_directory/data"
@@ -43,11 +50,11 @@ function calc_data_variance
             calc_variance_pids[$i]=$!
             i=$((i+1))
             sleep 1 
-            # calculate percentage of unfiltered daily anomaly variance
-            mute_ncl $GEODIAG_TOOLS/dataset/div_var.ncl "'dataset1=\"$output_data1\"'" \
-                                                        "'dataset2=\"$output_data2\"'" \
+            # calculate variance ratio of unfiltered daily anomaly variance
+            mute_ncl $GEODIAG_TOOLS/dataset/div_var.ncl "'dataset1=\"$output_data2\"'" \
+                                                        "'dataset2=\"$output_data1\"'" \
                                                         "'var=\"$var\"'" \
-                                                        "'output=\"$data_dir/$var.daily_anom.$season.variance_percentage.nc\"'"
+                                                        "'output=\"$data_dir/$var.daily_anom.$season.variance_ratio.nc\"'"
         done
     done
     for (( i = 0; i < ${#calc_variance_pids[@]}; ++i )); do
@@ -56,33 +63,87 @@ function calc_data_variance
     done
 }
 
-function plot_data_variance
+function plot_variance_ratio
 {
     output_directory=$1
     data_dir="$output_directory/data"
     figure_dir="$output_directory/figures"
-    for data in $(ls "$data_dir"/U850.*.variance.nc); do
-        mute_ncl $GEODIAG_PACKAGES/mjo/ncl_scripts/plot_U850_variance.ncl "'dataset=\"$data\"'" \
-                                                                          "'output_dir=\"$figure_dir\"'"
+    mute_ncl \"$GEODIAG_PACKAGES/mjo/ncl_scripts/plot_variance_ratio.ncl\" \
+        "'data_dir=\"$data_dir\"'" \
+        "'figure_dir=\"$figure_dir\"'"
+}
+
+function plot_variance
+{
+    output_directory=$1
+    data_dir="$output_directory/data"
+    figure_dir="$output_directory/figures"
+    mute_ncl \"$GEODIAG_PACKAGES/mjo/ncl_scripts/plot_variance.ncl\" \
+        "'data_dir=\"$data_dir\"'" \
+        "'figure_dir=\"$figure_dir\"'"
+}
+
+function calc_region_mean
+{
+    output_directory=$1
+    data_dir="$output_directory/data"
+    for var in $(echo "U850 U200 OLR"); do
+        for season in $(echo "all boreal_winter boreal_summer"); do
+            for region in $(echo "west_pacific" "indian_ocean"); do
+                # calculate region mean of unfiltered daily anomalies
+                data="$data_dir/$var.daily_anom.$season.nc"
+                mute_ncl $GEODIAG_PACKAGES/mjo/ncl_scripts/calc_region_mean.ncl \
+                    "'dataset=\"$data\"'" \
+                    "'var=\"$var\"'" \
+                    "'season=\"$season\"'" \
+                    "'region=\"$region\"'" \
+                    "'output=\"$data_dir/$var.daily_anom.$season.$region.nc\"'"
+                # calculate region mean of filtered daily anomalies
+                data="$data_dir/$var.filtered.daily_anom.$season.nc"
+                mute_ncl $GEODIAG_PACKAGES/mjo/ncl_scripts/calc_region_mean.ncl \
+                    "'dataset=\"$data\"'" \
+                    "'var=\"$var\"'" \
+                    "'season=\"$season\"'" \
+                    "'region=\"$region\"'" \
+                    "'output=\"$data_dir/$var.filtered.daily_anom.$season.$region.nc\"'"
+            done
+        done
     done
-    for data in $(ls "$data_dir"/U850.*.variance_percentage.nc); do
-        mute_ncl $GEODIAG_PACKAGES/mjo/ncl_scripts/plot_U850_variance_percentage.ncl "'dataset=\"$data\"'" \
-                                                                                     "'output_dir=\"$figure_dir\"'"
+}
+
+function plot_region_mean
+{
+    output_directory=$1
+    data_dir="$output_directory/data"
+    figure_dir="$output_directory/figures"
+    mute_ncl \"$GEODIAG_PACKAGES/mjo/ncl_scripts/plot_region_mean.ncl\" \
+        "'data_dir=\"$data_dir\"'" \
+        "'figure_dir=\"$figure_dir\"'"
+}
+
+function calc_time_spectra
+{
+    output_directory=$1
+    data_dir="$output_directory/data"
+    for var in $(echo "U850 U200 OLR"); do
+        for season in $(echo "boreal_winter boreal_summer"); do
+            for region in $(echo "west_pacific" "indian_ocean"); do
+                data="$data_dir/$var.daily_anom.$season.$region.nc"
+                mute_ncl $GEODIAG_PACKAGES/mjo/ncl_scripts/calc_time_spectra.ncl \
+                    "'dataset=\"$data\"'" \
+                    "'var=\"$var\"'" \
+                    "'output=\"$data_dir/$var.daily_anom.$season.$region.spectrum.nc\"'"
+            done
+        done
     done
-    for data in $(ls "$data_dir"/U200.*.variance.nc); do
-        mute_ncl $GEODIAG_PACKAGES/mjo/ncl_scripts/plot_U200_variance.ncl "'dataset=\"$data\"'" \
-                                                                          "'output_dir=\"$figure_dir\"'"
-    done
-    for data in $(ls "$data_dir"/U200.*.variance_percentage.nc); do
-        mute_ncl $GEODIAG_PACKAGES/mjo/ncl_scripts/plot_U200_variance_percentage.ncl "'dataset=\"$data\"'" \
-                                                                                     "'output_dir=\"$figure_dir\"'"
-    done
-    for data in $(ls "$data_dir"/OLR.*.variance.nc); do
-        mute_ncl $GEODIAG_PACKAGES/mjo/ncl_scripts/plot_OLR_variance.ncl "'dataset=\"$data\"'" \
-                                                                         "'output_dir=\"$figure_dir\"'"
-    done
-    for data in $(ls "$data_dir"/OLR.*.variance_percentage.nc); do
-        mute_ncl $GEODIAG_PACKAGES/mjo/ncl_scripts/plot_OLR_variance_percentage.ncl "'dataset=\"$data\"'" \
-                                                                                    "'output_dir=\"$figure_dir\"'"
-    done
+}
+
+function plot_time_spectra
+{
+    output_directory=$1
+    data_dir="$output_directory/data"
+    figure_dir="$output_directory/figures"
+    mute_ncl \"$GEODIAG_PACKAGES/mjo/ncl_scripts/plot_time_spectra.ncl\" \
+        "'data_dir=\"$data_dir\"'" \
+        "'figure_dir=\"$figure_dir\"'"
 }

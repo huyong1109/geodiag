@@ -34,6 +34,12 @@ function report_error_noexit
     echo -e "[$(add_color Error "red bold")]: $message" >&2
 }
 
+function get_answer
+{
+    read -e -p "> " ans
+    echo $ans
+}
+
 function check_file_existence
 {
     dir=$(dirname $1)

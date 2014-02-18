@@ -20,11 +20,19 @@ begin
     if (season .eq. "all") then
         idx = ispan(0, dimsizes(time)-1, 1)
     end if
-    if (season .eq. "DJF" .or. season .eq. "boreal_winter") then
+    if (season .eq. "DJF") then
         idx = ind(tmp(:,1) .eq. 12 .or. tmp(:,1) .eq. 1 .or. tmp(:,1) .eq. 2)
     end if
-    if (season .eq. "JJA" .or. season .eq. "boreal_summer") then
+    if (season .eq. "JJA") then
         idx = ind(tmp(:,1) .eq.  6 .or. tmp(:,1) .eq. 7 .or. tmp(:,1) .eq. 8)
+    end if
+    if (season .eq. "boreal_winter") then
+        idx = ind(tmp(:,1) .eq. 11 .or. tmp(:,1) .eq. 12 .or. tmp(:,1) .eq.  1 .or. \
+                  tmp(:,1) .eq.  2 .or. tmp(:,1) .eq.  3 .or. tmp(:,1) .eq.  4)
+    end if
+    if (season .eq. "boreal_summer") then
+        idx = ind(tmp(:,1) .eq.  5 .or. tmp(:,1) .eq.  6 .or. tmp(:,1) .eq.  7 .or. \
+                  tmp(:,1) .eq.  8 .or. tmp(:,1) .eq.  9 .or. tmp(:,1) .eq. 10)
     end if
 
     return(idx)
