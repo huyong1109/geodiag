@@ -124,14 +124,15 @@ GEODIAG is designed as an open platform. A @strong{framework} for writing
 diagnostics package is specified. When a package is written following the
 standard of this framework, it can be directly plugged into GEODIAG and readily
 used by other users. This standard does @emph{not} try to put handcuffs on
-researchers, but eliminate the unnecessary duplication of labor.
+researchers, but to eliminate the unnecessary duplication of labors.
 
 @strong{BASH} script is chosen as the developing language, because almost all
 the servers provide a uniform BASH shell environment. Ruby and Python are
-more suitable for constructing the framework, but some servers does not
-provide them and most researchers are not familiar with them.
-@code{<package-name>} repesents the package name (e.g. @code{mjo}) as
-previous.
+more suitable for constructing the framework, but some servers does not provide
+them@footnote{You will not want to deal with numerous software dependencies to
+install Ruby or Python with necessary version.} and most researchers are not
+familiar with them.  @code{<package-name>} repesents the package name (e.g.
+@code{mjo}) as previous.
 
 The package is driven through @code{geodiag} command as shown in @ref{Package
 usage}. Package developers should provide a @code{driver.sh} BASH script,
@@ -149,5 +150,9 @@ black box. GEODIAG will look for the available packages within the
 @end multitable
 @caption{Driver mandatory functions and their meanings.}
 @end float
+
+@section Example: MJO package
+
+To present the development of a package, a MJO package is developed as an example.
 
 @bye

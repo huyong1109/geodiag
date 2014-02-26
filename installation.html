@@ -21,6 +21,10 @@ comments: true
 	<p class="command_example">
 		source &ltpath_to_GEODIAG&gt/setup.sh
 	</p>
+    <p class="notice">
+        For Linux newbie, &ltpath_to_GEODIAG&gt is the directory where you put
+        GEODIAG, e.g. /opt/geodiag, so change it please!
+    </p>
     This will put the <b>&ltpath_to_GEODIAG&gt</b> into PATH, set the
     environment variables (e.g., <b>GEODIAG_ROOT</b>), and setup
     auto-completion. Next some tool components (e.g. EEMD) written in C or
@@ -29,6 +33,8 @@ comments: true
     	$ geodiag warmup
     </p>
     <p class="notice">
-    	Previously, this build stage is in setup.sh, but some user reported the echo command caused problem with <b>scp</b>, so I moved it into <b>warmup</b> subcommand.
+        Previously, this build stage is in setup.sh, but some user reported the
+        echo command caused problem with <b>scp</b>, so I moved it into
+        <b>warmup</b> subcommand.
     </p>
 </p>
