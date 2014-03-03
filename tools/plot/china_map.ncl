@@ -132,6 +132,7 @@ begin
     if (config@isAddMask) then
         ; suggested in http://bbs.06climate.com/forum.php?mod=viewthread&tid=11797&extra=page%3D1&page=1
         res@cnFillDrawOrder = "PreDraw"
+        res@cnLineDrawOrder = "PreDraw"
         res@mpDataBaseVersion = "MediumRes"
         res@mpDataSetName = "Earth..4"
         res@mpAreaMaskingOn = True
