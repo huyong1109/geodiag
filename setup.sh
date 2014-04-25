@@ -18,7 +18,10 @@ export PATH=$PATH:$GEODIAG_ROOT
 source $GEODIAG_TOOLS/bash_utils.sh
 
 # shared objects that can be loaded by NCL
-export NCL_DEF_LIB_DIR=$GEODIAG_TOOLS/shared
+if [[ -d $GEODIAG_TOOLS/shared ]]; then
+    # only define NCL_DEF_LIB_DIR when shared directory is created
+    export NCL_DEF_LIB_DIR=$GEODIAG_TOOLS/shared
+fi
 
 # source other setup.sh scripts
 for package_setup in $(find $GEODIAG_PACKAGES -name setup.sh); do
