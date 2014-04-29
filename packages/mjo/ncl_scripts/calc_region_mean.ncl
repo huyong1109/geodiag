@@ -40,7 +40,7 @@ begin
             end if
             end if
         else
-            report_error("Unknown season "+season+"!")
+            report_error("Under construction for season "+season+"!")
         end if
         end if
     else if (var .eq. "U200") then
@@ -67,7 +67,7 @@ begin
             end if
             end if
         else
-            report_error("Unknown season "+season+"!")
+            report_error("Under construction for season "+season+"!")
         end if
         end if
     else if (var .eq. "OLR") then
@@ -117,7 +117,7 @@ begin
             end if
             end if
         else
-            report_error("Under construction! "+var+" "+season)
+            report_error("Under construction for season "+season+"!")
         end if
         end if
     end if

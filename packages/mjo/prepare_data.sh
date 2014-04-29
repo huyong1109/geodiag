@@ -92,7 +92,7 @@ function calc_data_daily_anom
         notice "Start to calculate daily anomally of \"$var\"."
         mute_ncl $calc_daily_anom "'dataset=\"$data\"'" \
                                   "'var=\"$var\"'" \
-                                  "'output=\"$data_dir/${var}.daily_anom.all.nc\"'" &
+                                  "'output=\"$data_dir/${var}.unfiltered.daily_anom.all.nc\"'" &
         calc_data_daily_anom_pids[$i]=$!
         i=$((i+1))
         sleep 1
@@ -110,7 +110,7 @@ function run_lanczos_filter
     data_dir="$output_directory/data"
     i=0
     for var in $(echo "U850 U200 OLR PRECT"); do
-        data="$data_dir/$var.daily_anom.all.nc"
+        data="$data_dir/$var.unfiltered.daily_anom.all.nc"
         notice "Start to run Lanczos filter on daily anomaly of \"$var\"."
         mute_ncl $run_lanczos_filter "'dataset=\"$data\"'" \
                                      "'var=\"$var\"'" \
@@ -136,23 +136,15 @@ function select_season
     select_season="$GEODIAG_TOOLS/dataset/select_season.ncl"
     data_dir="$output_directory/data"
     for var in $(echo "U850 U200 OLR PRECT"); do
-        # unfiltered
-        data="$data_dir/${var}.daily_anom.all.nc"
-        for season in $(echo "boreal_winter boreal_summer"); do
-            notice "Start to extract season \"$season\" from \"$var\"."
-            mute_ncl $select_season "'dataset=\"$data\"'" \
-                                    "'var=\"$var\"'" \
-                                    "'season=\"$season\"'" \
-                                    "'output=\"$data_dir/${var}.daily_anom.$season.nc\"'"
-        done
-        # filtered
-        data="$data_dir/${var}.filtered.daily_anom.all.nc"
-        for season in $(echo "boreal_winter boreal_summer"); do
-            notice "Start to extract season \"$season\" from filtered \"$var\"."
-            mute_ncl $select_season "'dataset=\"$data\"'" \
-                                    "'var=\"$var\"'" \
-                                    "'season=\"$season\"'" \
-                                    "'output=\"$data_dir/${var}.filtered.daily_anom.$season.nc\"'"
+        for flag in $(echo "unfiltered filtered"); do
+            data="$data_dir/$var.$flag.daily_anom.all.nc"
+            for season in $(echo "boreal_winter boreal_summer"); do
+                notice "Start to extract season \"$season\" from $flag \"$var\"."
+                mute_ncl $select_season "'dataset=\"$data\"'" \
+                                        "'var=\"$var\"'" \
+                                        "'season=\"$season\"'" \
+                                        "'output=\"$data_dir/$var.$flag.daily_anom.$season.nc\"'"
+            done
         done
     done
 }

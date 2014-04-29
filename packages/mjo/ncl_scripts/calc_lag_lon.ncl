@@ -7,12 +7,13 @@ load "$GEODIAG_ROOT/geodiag.ncl"
 begin
 
     check_cmd_arg("dataset")
-    check_cmd_arg("refer")
+    check_cmd_arg("refer_dataset")
     check_cmd_arg("var")
+    check_cmd_arg("refer_var")
     check_cmd_arg("output")
 
     fin1 = addfile(dataset, "r")
-    fin2 = addfile(refer, "r")
+    fin2 = addfile(refer_dataset, "r")
 
     max_lag_days = 30
     if (max_lag_days .gt. dimsizes(fin1->time)/4) then
@@ -23,7 +24,7 @@ begin
     num_lag = 2*max_lag_days+1
 
     data1 = dim_avg_n_Wrap(fin1->$var$(time|:,{lat|-10:10},lon|:), 1) ; TODO: Should we use area-weighted average function?
-    data2 = fin2->$var$
+    data2 = fin2->$refer_var$
 
     ccr = new((/num_lon,num_lag/), float)
 
@@ -46,7 +47,7 @@ begin
     filevardef(fout, "lag", "integer", "lag")
     fout->lag@long_name = "lag days"
     filevardef(fout, "ccr", typeof(ccr), (/"lon","lag"/))
-    fout->ccr@long_name = "lag-longitude cross correlations"
+    fout->ccr@long_name = "lag-longitude cross correlations upon "+refer_var
 
     setfileoption(fout, "DefineMode", False)
 
