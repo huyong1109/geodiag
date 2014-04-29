@@ -14,47 +14,65 @@ function run_level_1
     # calculate time spectra
     calc_time_spectra "$output_directory"
     plot_time_spectra "$output_directory"
+    # calculate lag correlation
+    calc_lag_lon "$output_directory"
+    plot_lag_lon "$output_directory"
+    calc_lag_lat "$output_directory"
+    plot_lag_lat "$output_directory"
+    # calculate EOF
+#    calc_eof "$output_directory"
 }
 
 function calc_variance
 {
     output_directory=$1
     data_dir="$output_directory/data"
-    calc_variance="$GEODIAG_TOOLS/statistics/calc_variance.ncl"
-    start_ymd=$(mute_ncl $GEODIAG_TOOLS/dataset/query_start_time.ncl "'dataset=\"$data_dir/U850.filtered.daily_anom.all.nc\"'")
-    end_ymd=$(mute_ncl $GEODIAG_TOOLS/dataset/query_end_time.ncl "'dataset=\"$data_dir/U850.filtered.daily_anom.all.nc\"'")
+    start_ymd=$(mute_ncl \"$GEODIAG_TOOLS/dataset/query_start_time.ncl\" \
+        "'dataset=\"$data_dir/U850.filtered.daily_anom.all.nc\"'")
+    end_ymd=$(mute_ncl \"$GEODIAG_TOOLS/dataset/query_end_time.ncl\" \
+        "'dataset=\"$data_dir/U850.filtered.daily_anom.all.nc\"'")
     i=0
-    for var in $(echo "U850 U200 OLR"); do
+    for var in $(echo "U850 U200 OLR PRECT"); do
         for season in $(echo "all boreal_winter boreal_summer"); do
             # calculate variance of unfiltered daily anomalies
-            input_data1="$data_dir/$var.daily_anom.$season.nc"
-            output_data1="$data_dir/$var.daily_anom.$season.variance.nc"
             notice "Calcuate variance of $var at season $season."
-            mute_ncl $calc_variance "'dataset=\"$input_data1\"'" \
-                                    "'var=\"$var\"'" \
-                                    "start_ymd=$start_ymd" \
-                                    "end_ymd=$end_ymd" \
-                                    "'output=\"$output_data1\"'" &
+            mute_ncl \"$GEODIAG_TOOLS/statistics/calc_variance.ncl\" \
+                "'dataset=\"$data_dir/$var.daily_anom.$season.nc\"'" \
+                "'var=\"$var\"'" \
+                "start_ymd=$start_ymd" \
+                "end_ymd=$end_ymd" \
+                "'output=\"$data_dir/$var.daily_anom.$season.variance.nc\"'" &
             calc_variance_pids[$i]=$!
             i=$((i+1))
             sleep 1 
             # calculate variance of filtered daily anomalies
-            input_data2="$data_dir/$var.filtered.daily_anom.$season.nc"
-            output_data2="$data_dir/$var.filtered.daily_anom.$season.variance.nc"
             notice "Calcuate variance of $var at season $season."
-            mute_ncl $calc_variance "'dataset=\"$input_data2\"'" \
-                                    "'var=\"$var\"'" \
-                                    "start_ymd=$start_ymd" \
-                                    "end_ymd=$end_ymd" \
-                                    "'output=\"$output_data2\"'" &
+            mute_ncl \"$GEODIAG_TOOLS/statistics/calc_variance.ncl\" \
+                "'dataset=\"$data_dir/$var.filtered.daily_anom.$season.nc\"'" \
+                "'var=\"$var\"'" \
+                "start_ymd=$start_ymd" \
+                "end_ymd=$end_ymd" \
+                "'output=\"$data_dir/$var.filtered.daily_anom.$season.variance.nc\"'" &
             calc_variance_pids[$i]=$!
             i=$((i+1))
             sleep 1 
+        done
+    done
+    for (( i = 0; i < ${#calc_variance_pids[@]}; ++i )); do
+        notice "Waiting job ${calc_variance_pids[$i]} ..."
+        wait ${calc_variance_pids[$i]}
+    done
+    i=0
+    for var in $(echo "U850 U200 OLR PRECT"); do
+        for season in $(echo "all boreal_winter boreal_summer"); do
             # calculate variance ratio of unfiltered daily anomaly variance
-            mute_ncl $GEODIAG_TOOLS/dataset/div_var.ncl "'dataset1=\"$output_data2\"'" \
-                                                        "'dataset2=\"$output_data1\"'" \
-                                                        "'var=\"$var\"'" \
-                                                        "'output=\"$data_dir/$var.daily_anom.$season.variance_ratio.nc\"'"
+            mute_ncl \"$GEODIAG_TOOLS/dataset/div_var.ncl\" \
+                "'dataset1=\"$data_dir/$var.filtered.daily_anom.$season.variance.nc\"'" \
+                "'dataset2=\"$data_dir/$var.daily_anom.$season.variance.nc\"'" \
+                "'var=\"$var\"'" \
+                "'output=\"$data_dir/$var.daily_anom.$season.variance_ratio.nc\"'"
+            i=$((i+1))
+            sleep 1 
         done
     done
     for (( i = 0; i < ${#calc_variance_pids[@]}; ++i )); do
@@ -87,21 +105,19 @@ function calc_region_mean
 {
     output_directory=$1
     data_dir="$output_directory/data"
-    for var in $(echo "U850 U200 OLR"); do
+    for var in $(echo "U850 U200 OLR PRECT"); do
         for season in $(echo "all boreal_winter boreal_summer"); do
             for region in $(echo "west_pacific" "indian_ocean"); do
                 # calculate region mean of unfiltered daily anomalies
-                data="$data_dir/$var.daily_anom.$season.nc"
                 mute_ncl $GEODIAG_PACKAGES/mjo/ncl_scripts/calc_region_mean.ncl \
-                    "'dataset=\"$data\"'" \
+                    "'dataset=\"$data_dir/$var.daily_anom.$season.nc\"'" \
                     "'var=\"$var\"'" \
                     "'season=\"$season\"'" \
                     "'region=\"$region\"'" \
                     "'output=\"$data_dir/$var.daily_anom.$season.$region.nc\"'"
                 # calculate region mean of filtered daily anomalies
-                data="$data_dir/$var.filtered.daily_anom.$season.nc"
                 mute_ncl $GEODIAG_PACKAGES/mjo/ncl_scripts/calc_region_mean.ncl \
-                    "'dataset=\"$data\"'" \
+                    "'dataset=\"$data_dir/$var.filtered.daily_anom.$season.nc\"'" \
                     "'var=\"$var\"'" \
                     "'season=\"$season\"'" \
                     "'region=\"$region\"'" \
@@ -125,12 +141,11 @@ function calc_time_spectra
 {
     output_directory=$1
     data_dir="$output_directory/data"
-    for var in $(echo "U850 U200 OLR"); do
+    for var in $(echo "U850 U200 OLR PRECT"); do
         for season in $(echo "boreal_winter boreal_summer"); do
             for region in $(echo "west_pacific" "indian_ocean"); do
-                data="$data_dir/$var.daily_anom.$season.$region.nc"
-                mute_ncl $GEODIAG_PACKAGES/mjo/ncl_scripts/calc_time_spectra.ncl \
-                    "'dataset=\"$data\"'" \
+                mute_ncl \"$GEODIAG_PACKAGES/mjo/ncl_scripts/calc_time_spectra.ncl\" \
+                    "'dataset=\"$data_dir/$var.daily_anom.$season.$region.nc\"'" \
                     "'var=\"$var\"'" \
                     "'output=\"$data_dir/$var.daily_anom.$season.$region.spectrum.nc\"'"
             done
@@ -146,4 +161,69 @@ function plot_time_spectra
     mute_ncl \"$GEODIAG_PACKAGES/mjo/ncl_scripts/plot_time_spectra.ncl\" \
         "'data_dir=\"$data_dir\"'" \
         "'figure_dir=\"$figure_dir\"'"
+}
+
+function calc_lag_lon
+{
+    output_directory=$1
+    data_dir="$output_directory/data"
+    for var in $(echo "U850 U200 OLR PRECT"); do
+        for season in $(echo "boreal_winter boreal_summer"); do
+            mute_ncl \"$GEODIAG_PACKAGES/mjo/ncl_scripts/calc_lag_lon.ncl\" \
+                "'dataset=\"$data_dir/$var.daily_anom.$season.nc\"'" \
+                "'refer=\"$data_dir/$var.daily_anom.$season.indian_ocean.nc\"'" \
+                "'var=\"$var\"'" \
+                "'output=\"$data_dir/$var.daily_anom.$season.lag_lon.nc\"'"
+        done
+    done
+}
+
+function plot_lag_lon
+{
+    output_directory=$1
+    data_dir="$output_directory/data"
+    figure_dir="$output_directory/figures"
+    mute_ncl \"$GEODIAG_PACKAGES/mjo/ncl_scripts/plot_lag_lon.ncl\" \
+        "'data_dir=\"$data_dir\"'" \
+        "'figure_dir=\"$figure_dir\"'"
+}
+
+function calc_lag_lat
+{
+    output_directory=$1
+    data_dir="$output_directory/data"
+    for var in $(echo "U850 U200 OLR PRECT"); do
+        for season in $(echo "boreal_winter boreal_summer"); do
+            mute_ncl \"$GEODIAG_PACKAGES/mjo/ncl_scripts/calc_lag_lat.ncl\" \
+                "'dataset=\"$data_dir/$var.daily_anom.$season.nc\"'" \
+                "'refer=\"$data_dir/$var.daily_anom.$season.indian_ocean.nc\"'" \
+                "'var=\"$var\"'" \
+                "'output=\"$data_dir/$var.daily_anom.$season.lag_lat.nc\"'"
+        done
+    done
+}
+
+function plot_lag_lat
+{
+    output_directory=$1
+    data_dir="$output_directory/data"
+    figure_dir="$output_directory/figures"
+    mute_ncl \"$GEODIAG_PACKAGES/mjo/ncl_scripts/plot_lag_lat.ncl\" \
+        "'data_dir=\"$data_dir\"'" \
+        "'figure_dir=\"$figure_dir\"'"
+}
+
+function calc_eof
+{
+    output_directory=$1
+    data_dir="$output_directory/data"
+    for var in $(echo "U850 U200 OLR PRECT"); do
+        for season in $(echo "boreal_winter boreal_summer"); do
+            echo "$var $season"
+            mute_ncl \"$GEODIAG_TOOLS/statistics/calc_eof.ncl\" \
+                "'dataset=\"$data_dir/$var.filtered.daily_anom.$season.nc\"'" \
+                "'var=\"$var\"'" \
+                "num_eof=3"
+        done
+    done
 }

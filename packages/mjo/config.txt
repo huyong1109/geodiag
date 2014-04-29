@@ -1,5 +1,7 @@
-model_data_root     =   ./model_data
-model_data_pattern  =   gamil_benchmark.gamil.h1.*.nc
-model_data_list     =   U200 U850 FLUTOA
-internal_data_map   =   FLUTOA->OLR
+cmor_data_root      =   /work/wangbin_work/shensi/gamil-cmor-d36/dongli_gamilsole_fixSST/output/CMIP5/output/LASG-CESS/FGOALS-g2/amip
+cmor_exp_id         =   r12i1p1
+cmor_data_list      =   pr rlut ua200 ua850
+internal_data_map   =   pr->PRECT rlut->OLR ua200->U200 ua850->U850
+start_date          =   19790101
+end_date            =   19841231
 output_directory    =   ./result

@@ -85,7 +85,7 @@ begin
         else if (season .eq. "boreal_summer") then
             if (region .eq. "west_pacific") then
                 var_mean = calc_region_mean(fin, var, \
-                    80.0d0, 100.0d0, 10.0d0, 25.0d0)
+                    115.0d0, 140.0d0, 10.0d0, 25.0d0)
             else if (region .eq. "indian_ocean") then
                 var_mean = calc_region_mean(fin, var, \
                     75.0d0, 100.0d0, -10.0d0, 5.0d0)
@@ -97,6 +97,30 @@ begin
             report_error("Unknown season "+season+"!")
         end if
         end if
+    else if (var .eq. "PRECT") then
+        if (season .eq. "boreal_winter") then
+            if (region .eq. "west_pacific") then
+                var_mean = calc_region_mean(fin, var, \
+                    160.0d0, 185.0d0, -20.0d0, -5.0d0)
+            else if (region .eq. "indian_ocean") then
+                var_mean = calc_region_mean(fin, var, \
+                    75.0d0, 100.0d0, -10.0d0, -5.0d0)
+            end if
+            end if
+        else if (season .eq. "boreal_summer") then
+            if (region .eq. "west_pacific") then
+                var_mean = calc_region_mean(fin, var, \
+                    115.0d0, 140.0d0, 10.0d0, 25.0d0)
+            else if (region .eq. "indian_ocean") then
+                var_mean = calc_region_mean(fin, var, \
+                    75.0d0, 100.0d0, -10.0d0, -5.0d0)
+            end if
+            end if
+        else
+            report_error("Under construction! "+var+" "+season)
+        end if
+        end if
+    end if
     end if
     end if
     end if

@@ -2,16 +2,17 @@
 
 function prepare_model_data
 {
-    notice "Prepare model data for $(add_color mjo 'magenta bold') diagnostics."
-    model_data_root=$1
-    # concatenate data
-    model_data_pattern=$2
-    model_data_files=$(find $model_data_root -name "$model_data_pattern")
-    model_data_list=$3
+    notice "Prepare cmor data for $(add_color mjo 'magenta bold') diagnostics."
+    cmor_data_root=$1
+    cmor_exp_id=$2
+    cmor_data_list=$3
     internal_data_map=$4
-    output_directory=$5
-    cat_data "$model_data_files" "$model_data_list" "$internal_data_map" \
-             "$output_directory"
+    start_date=$5
+    end_date=$6
+    output_directory=$7
+    # concatenate data
+    cat_data "$cmor_data_root" "$cmor_exp_id" "$cmor_data_list" \
+             "$internal_data_map" "$start_date" "$end_date" "$output_directory"
     # calculate daily anomalies
     calc_data_daily_anom "$output_directory"
     # run Lanczos filter
@@ -22,10 +23,13 @@ function prepare_model_data
 
 function cat_data
 {
-    model_data_files=$1
-    model_data_list=$2
-    internal_data_map=$3
-    output_directory=$4
+    cmor_data_root=$1
+    cmor_exp_id=$2
+    cmor_data_list=$3
+    internal_data_map=$4
+    start_date=$5
+    end_date=$6
+    output_directory=$7
     # create a directory to store internal data files
     data_dir="$output_directory/data"
     if [[ ! -d "$data_dir" ]]; then
@@ -34,25 +38,32 @@ function cat_data
     fi
     cat_var="$GEODIAG_TOOLS/dataset/cat_var.ncl"
     i=0
-    for model_data in $model_data_list; do
+    for cmor_data in $cmor_data_list; do
         var_alias=""
         for data_map in $internal_data_map; do
-            if [[ ${data_map/->*/} == $model_data ]]; then
+            if [[ ${data_map/->*/} == $cmor_data ]]; then
                  var_alias=${data_map/*->/}
                  break
             fi
         done
-        notice "Start to concatenate \"$model_data\"."
+        notice "Start to concatenate \"$cmor_data\"."
+        cmor_data_dir="$cmor_data_root/day/atmos/$cmor_data/$exp_id"
+        cmor_data_files=$(find $cmor_data_dir -name "*.nc")
         if [[ "$var_alias" != "" ]]; then
-            mute_ncl $cat_var "'datasets=\"$(echo $model_data_files)\"'" \
-                              "'var=\"$model_data\"'" \
+            mute_ncl $cat_var "'datasets=\"$(echo $cmor_data_files)\"'" \
+                              "'var=\"$cmor_data\"'" \
                               "'var_alias=\"$var_alias\"'" \
                               "'output=\"$data_dir/$var_alias.nc\"'" \
+                              "start_date=$start_date" \
+                              "end_date=$end_date" \
                               "freq=1" &
         else
-            mute_ncl $cat_var "'datasets=\"$(echo $model_data_files)\"'" \
-                              "'var=\"$model_data\"'" \
-                              "'output=\"$data_dir/$model_data.nc\"'" \
+            mute_ncl $cat_var "'datasets=\"$(echo $cmor_data_files)\"'" \
+                              "'var=\"$cmor_data\"'" \
+                              "'date_range=\"$date_range\"'" \
+                              "'output=\"$data_dir/$cmor_data.nc\"'" \
+                              "start_date=$start_date" \
+                              "end_date=$end_date" \
                               "freq=1" &
         fi
         cat_var_pids[$i]=$!
@@ -62,8 +73,8 @@ function cat_data
         notice "Waiting job ${cat_var_pids[$i]} ..."
         wait ${cat_var_pids[$i]}
     done
-    # now we should have U850.nc, U200.nc and OLR.nc
-    for file in $(echo "U850.nc U200.nc OLR.nc"); do
+    # now we should have U850.nc, U200.nc, OLR.nc, PRECT.nc
+    for file in $(echo "U850.nc U200.nc OLR.nc PRECT.nc"); do
         if [[ ! -f $data_dir/$file ]]; then
             report_error "Internal data \"$data_dir/$file\" should exist, but not!"
         fi
@@ -76,9 +87,8 @@ function calc_data_daily_anom
     calc_daily_anom="$GEODIAG_TOOLS/statistics/calc_daily_anom.ncl"
     data_dir="$output_directory/data"
     i=0
-    for file in $(echo "U850.nc U200.nc OLR.nc"); do
-        data="$data_dir/$file"
-        var=$(basename $data .nc)
+    for var in $(echo "U850 U200 OLR PRECT"); do
+        data="$data_dir/$var.nc"
         notice "Start to calculate daily anomally of \"$var\"."
         mute_ncl $calc_daily_anom "'dataset=\"$data\"'" \
                                   "'var=\"$var\"'" \
@@ -99,9 +109,8 @@ function run_lanczos_filter
     run_lanczos_filter="$GEODIAG_TOOLS/statistics/run_lanczos_filter.ncl"
     data_dir="$output_directory/data"
     i=0
-    for file in $(echo "U850.daily_anom.all.nc U200.daily_anom.all.nc OLR.daily_anom.all.nc"); do
-        data="$data_dir/$file"
-        var=$(basename $data .daily_anom.all.nc)
+    for var in $(echo "U850 U200 OLR PRECT"); do
+        data="$data_dir/$var.daily_anom.all.nc"
         notice "Start to run Lanczos filter on daily anomaly of \"$var\"."
         mute_ncl $run_lanczos_filter "'dataset=\"$data\"'" \
                                      "'var=\"$var\"'" \
@@ -126,7 +135,7 @@ function select_season
     output_directory=$1
     select_season="$GEODIAG_TOOLS/dataset/select_season.ncl"
     data_dir="$output_directory/data"
-    for var in $(echo "U850 U200 OLR"); do
+    for var in $(echo "U850 U200 OLR PRECT"); do
         # unfiltered
         data="$data_dir/${var}.daily_anom.all.nc"
         for season in $(echo "boreal_winter boreal_summer"); do

@@ -103,6 +103,5 @@ function mute_ncl
 {
     ncl_cmd=$*
     eval ncl $ncl_cmd | grep -v "^ \(Copyright\|University Corporation for Atmospheric Research\|NCAR Command Language Version\|The use of this software is governed by a License Agreement\|See http://www.ncl.ucar.edu/ for more details\)"
-    #eval $ncl_cmd | grep '^\[.*\]:'
 }
 

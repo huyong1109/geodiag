@@ -26,16 +26,16 @@ function mjo_run
     # parse configuration
     parse_config $1
     # prepare data
-    prepare_model_data "$model_data_root" "$model_data_pattern" \
-                       "$model_data_list" "$internal_data_map" \
-                       "$output_directory"
+    prepare_model_data "$cmor_data_root" "$cmor_exp_id" \
+                       "$cmor_data_list" "$internal_data_map" \
+                       "$start_date" "$end_date" "$output_directory"
     if [[ ! -d "$output_directory/figures" ]]; then
         mkdir "$output_directory/figures"
     fi
     # run level-1 diagnosis
     run_level_1 "$output_directory"
-    # run level-2 diagnosis
+    ## run level-2 diagnosis
     #run_level_2
-    # run supplemental diagnosis
+    ## run supplemental diagnosis
     #run_supp
 }

@@ -13,7 +13,7 @@
 export GEODIAG_ROOT=$(cd $(dirname $BASH_ARGV) && pwd)
 export GEODIAG_PACKAGES=$GEODIAG_ROOT/packages
 export GEODIAG_TOOLS=$GEODIAG_ROOT/tools
-export PATH=$PATH:$GEODIAG_ROOT
+export PATH=$GEODIAG_ROOT:$PATH
 
 source $GEODIAG_TOOLS/bash_utils.sh
 

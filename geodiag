@@ -113,4 +113,7 @@ case $1 in
         ${package}_run ${*:3}
     fi
     ;;
+*)
+    geodiag_help
+    ;;
 esac
