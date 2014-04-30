@@ -24,6 +24,8 @@ function parse_config
     notice "start_date is \"$start_date\"."
     end_date=$(get_config_entry $config_file "end_date")
     notice "end_date is \"$end_date\"."
+    diag_stages=$(get_config_entry $config_file "diag_stages")
+    notice "diag_stages is \"$diag_stages\"."
     output_directory=$(get_config_entry $config_file "output_directory")
     if [[ -d "$output_directory" ]]; then
         report_warning "Output directory \"$output_directory\" exists. Override it (y/n)?"

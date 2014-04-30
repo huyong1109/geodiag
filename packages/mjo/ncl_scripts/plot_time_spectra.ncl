@@ -24,19 +24,22 @@ begin
     seasons = (/"boreal_winter","boreal_summer"/)
     regions = (/"indian_ocean","west_pacific"/)
     vars = (/"U850","U200","OLR"/)
+    flags = (/"unfiltered","filtered"/)
 
-    plots = new((/dimsizes(vars)/), graphic)
+    plots = new((/dimsizes(vars),dimsizes(flags)/), graphic)
 
     do i = 0, dimsizes(seasons)-1
         do j = 0, dimsizes(regions)-1
             do k = 0, dimsizes(vars)-1
-                fin = addfile(data_dir+"/"+vars(k)+".daily_anom."+seasons(i)+"."+regions(j)+".spectrum.nc", "r")
-                res_plot@tiXAxisString = "frequency"
-                res_plot@tiYAxisString = vars(k)
-                plots(k) = gsn_csm_xy(wks, fin->spec@frq, fin->splt, res_plot)
+                do l = 0, dimsizes(flags)-1
+                    fin = addfile(data_dir+"/"+vars(k)+"."+flags(l)+".daily_anom."+seasons(i)+"."+regions(j)+".spectrum.nc", "r")
+                    res_plot@tiXAxisString = "frequency"
+                    res_plot@tiYAxisString = vars(k)
+                    plots(k,l) = gsn_csm_xy(wks, fin->spec@frq, fin->splt, res_plot)
+                end do
             end do
             res_panel@txString = seasons(i)+" "+regions(j)+" spectrum"
-            gsn_panel(wks, plots, (/dimsizes(vars),1/), res_panel)
+            gsn_panel(wks, ndtooned(plots), (/dimsizes(vars),dimsizes(flags)/), res_panel)
         end do
     end do
 

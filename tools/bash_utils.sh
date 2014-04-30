@@ -99,6 +99,19 @@ function get_config_entry
     echo ${entry_value/^ */}
 }
 
+function should_run
+{
+    diag_stages=$1
+    stage=$2
+    if [[ $diag_stages == "" || $diag_stages == "all" ]]; then
+        return 0
+    fi
+    if [[ $diag_stages =~ $stage ]]; then
+        return 0
+    fi
+    return 1
+}
+
 function mute_ncl
 {
     ncl_cmd=$*

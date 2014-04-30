@@ -6,17 +6,11 @@ load "$GEODIAG_ROOT/geodiag.ncl"
 
 begin
 
-    check_cmd_arg("dataset")
-    check_cmd_arg("var")
     check_cmd_arg("refer_var")
-    check_cmd_arg("season")
-    check_cmd_arg("flag")
+    check_cmd_arg("data_dir")
     check_cmd_arg("figure_dir")
 
-    fin = addfile(dataset, "r")
-
-    figure_name = var+"."+flag+"."+season+".lag_lat"
-    wks = gsn_open_wks("pdf", figure_dir+"/"+figure_name)
+    wks = gsn_open_wks("pdf", figure_dir+"/lag_lat")
 
     colormap = (/(/1.00,1.00,1.00/), \
                  (/0.00,0.00,0.00/), \
@@ -41,31 +35,62 @@ begin
 
     gsn_define_colormap(wks, colormap)
 
-    res = True
-    res@cnLinesOn = False
-    res@cnFillOn = True
-    res@cnLevelSelectionMode = "ManualLevels"
-    res@cnMinLevelValF = -0.8
-    res@cnMaxLevelValF =  0.8
-    res@cnLevelSpacingF = 0.1
-    res@gsnSpreadColors = True
-    res@lbLabelFontHeightF = 0.015
-    res@pmLabelBarWidthF = 0.8
-    res@pmLabelBarHeightF = 0.05
-    res@pmLabelBarOrthogonalPosF = 0.1
-    res@tiXAxisOffsetYF = 0.1
-    res@vpWidthF = 0.6
-    res@vpHeightF = 0.4
-    res@tiYAxisString = "Lag (Day)"
-    res@tiYAxisFontHeightF = 0.02
-    res@lbTitleString = "IO: 75-100E, 10S-5N"
-    res@lbTitleJust = "BottomLeft"
-    res@lbTitleFontHeightF = "0.015"
-    res@gsnLeftString = "lag-latitude of "+var+" refer to "+refer_var+" on IO at "+season
-    res@gsnLeftStringFontHeightF = 0.015
+    res_panel = True
+    res_panel@gsnMaximize = True
 
-    plot = gsn_csm_contour(wks, transpose(fin->ccr), res)
+    res_plot = True
+    res_plot@gsnDraw = False
+    res_plot@gsnFrame = False
+    res_plot@cnLevelSelectionMode = "ManualLevels"
+    res_plot@cnMinLevelValF = -0.8
+    res_plot@cnMaxLevelValF =  0.8
+    res_plot@cnLevelSpacingF = 0.1
+    res_plot@cnLineThicknessF = 2.0
+    res_plot@cnInfoLabelOn = False
+    res_plot@cnLineLabelPlacementMode = "Computed"
+    res_plot@cnLineLabelDensityF = 2.0
+    res_plot@cnLineLabelInterval = 1
+    res_plot@gsnSpreadColors = True
+    res_plot@lbLabelFontHeightF = 0.015
+    res_plot@pmLabelBarWidthF = 0.6
+    res_plot@pmLabelBarOrthogonalPosF = 0.1
+    res_plot@tiXAxisOffsetYF = 0.1
+    res_plot@vpWidthF = 0.6
+    res_plot@vpHeightF = 0.4
+    res_plot@tiYAxisString = "Lag (Day)"
+    res_plot@tiYAxisFontHeightF = 0.02
+    res_plot@lbTitleFuncCode = "~"
+    res_plot@lbTitleString = "IO: 75~S~o~N~-100~S~o~N~E, 10~S~o~N~S-5~S~o~N~N"
+    res_plot@lbTitleJust = "BottomLeft"
+    res_plot@lbTitleFontHeightF = 0.015
+    res_plot@gsnLeftString = ""
+    res_plot@gsnContourZeroLineThicknessF = 3.0
+    res_plot@gsnContourNegLineDashPattern = 1
+    res_plot@pmTickMarkDisplayMode = "Always"
 
-    notice("Figure "+figure_name+".pdf is created.")
+    flags = (/"unfiltered","filtered"/)
+    seasons = (/"boreal_winter","boreal_summer"/)
+    season_alias = (/"winter (Nov-Apr)", "summer (May-Oct)"/)
+
+    plots = new((/dimsizes(seasons)/), graphic)
+
+    do i = 0, dimsizes(flags)-1
+        res_plot@tiMainString = "Lag-latitude refer to "+refer_var+" in IO ("+flags(i)+")"
+        do j = 0, dimsizes(seasons)-1
+            f0 = addfile(data_dir+"/OLR."+flags(i)+".daily_anom."+seasons(j)+".lag_lat.nc", "r")
+            f1 = addfile(data_dir+"/U850."+flags(i)+".daily_anom."+seasons(j)+".lag_lat.nc", "r")
+            res_plot@gsnRightString = season_alias(j)
+            res_plot@cnLinesOn = False
+            res_plot@cnFillOn = True
+            plots(j) = gsn_csm_contour(wks, transpose(f0->ccr), res_plot)
+            res_plot@cnLinesOn = True
+            res_plot@cnFillOn = False
+            plot = gsn_csm_contour(wks, transpose(f1->ccr), res_plot)
+            overlay(plots(j), plot)
+        end do
+        gsn_panel(wks, plots, (/1,dimsizes(seasons)/), res_panel)
+    end do
+
+    notice("Figure lag_lat.pdf is created.")
 
 end

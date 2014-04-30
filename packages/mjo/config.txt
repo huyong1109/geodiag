@@ -3,5 +3,6 @@ cmor_exp_id         =   r12i1p1
 cmor_data_list      =   pr rlut ua200 ua850
 internal_data_map   =   pr->PRECT rlut->OLR ua200->U200 ua850->U850
 start_date          =   19790101
-end_date            =   19841231
+end_date            =   20081231
 output_directory    =   ./result
+diag_stages         =   run_level_1

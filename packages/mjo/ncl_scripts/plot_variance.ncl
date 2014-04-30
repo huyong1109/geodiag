@@ -39,7 +39,7 @@ begin
 
     do i = 0, dimsizes(seasons)-1
         do j = 0, dimsizes(vars)-1
-            fin = addfile(data_dir+"/"+vars(j)+".daily_anom."+seasons(i)+".variance.nc", "r")
+            fin = addfile(data_dir+"/"+vars(j)+".unfiltered.daily_anom."+seasons(i)+".variance.nc", "r")
             ;res_plot@cnLevelSelectionMode = "ManualLevels"
             ;res_plot@cnMinLevelValF = min_level(j)
             ;res_plot@cnMaxLevelValF = max_level(j)

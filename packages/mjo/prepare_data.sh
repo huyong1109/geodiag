@@ -1,6 +1,6 @@
 #!/bin/bash
 
-function prepare_model_data
+function prepare_cmor_data
 {
     notice "Prepare cmor data for $(add_color mjo 'magenta bold') diagnostics."
     cmor_data_root=$1
@@ -46,7 +46,7 @@ function cat_data
                  break
             fi
         done
-        notice "Start to concatenate \"$cmor_data\"."
+        notice "Start to concatenate $(add_color $cmor_data 'green')."
         cmor_data_dir="$cmor_data_root/day/atmos/$cmor_data/$exp_id"
         cmor_data_files=$(find $cmor_data_dir -name "*.nc")
         if [[ "$var_alias" != "" ]]; then
@@ -68,9 +68,10 @@ function cat_data
         fi
         cat_var_pids[$i]=$!
         i=$((i+1))
+        sleep 1
     done
     for (( i = 0; i < ${#cat_var_pids[@]}; ++i )); do
-        notice "Waiting job ${cat_var_pids[$i]} ..."
+        #notice "Waiting job ${cat_var_pids[$i]} ..."
         wait ${cat_var_pids[$i]}
     done
     # now we should have U850.nc, U200.nc, OLR.nc, PRECT.nc
@@ -89,7 +90,7 @@ function calc_data_daily_anom
     i=0
     for var in $(echo "U850 U200 OLR PRECT"); do
         data="$data_dir/$var.nc"
-        notice "Start to calculate daily anomally of \"$var\"."
+        notice "Start to calculate daily anomally of $(add_color $var 'green')."
         mute_ncl $calc_daily_anom "'dataset=\"$data\"'" \
                                   "'var=\"$var\"'" \
                                   "'output=\"$data_dir/${var}.unfiltered.daily_anom.all.nc\"'" &
@@ -98,7 +99,7 @@ function calc_data_daily_anom
         sleep 1
     done
     for (( i = 0; i < ${#cat_var_pids[@]}; ++i )); do
-        notice "Waiting job ${calc_data_daily_anom_pids[$i]} ..."
+        #notice "Waiting job ${calc_data_daily_anom_pids[$i]} ..."
         wait ${calc_data_daily_anom_pids[$i]}
     done
 }
@@ -111,7 +112,7 @@ function run_lanczos_filter
     i=0
     for var in $(echo "U850 U200 OLR PRECT"); do
         data="$data_dir/$var.unfiltered.daily_anom.all.nc"
-        notice "Start to run Lanczos filter on daily anomaly of \"$var\"."
+        notice "Start to run Lanczos filter on daily anomaly of $(add_color $var 'green')."
         mute_ncl $run_lanczos_filter "'dataset=\"$data\"'" \
                                      "'var=\"$var\"'" \
                                      "'pass=\"band\"'" \
@@ -125,7 +126,7 @@ function run_lanczos_filter
         sleep 1
     done
     for (( i = 0; i < ${#run_lanczos_filter_pids[@]}; ++i )); do
-        notice "Waiting job ${run_lanczos_filter_pids[$i]} ..."
+        #notice "Waiting job ${run_lanczos_filter_pids[$i]} ..."
         wait ${run_lanczos_filter_pids[$i]}
     done
 }
@@ -139,7 +140,7 @@ function select_season
         for flag in $(echo "unfiltered filtered"); do
             data="$data_dir/$var.$flag.daily_anom.all.nc"
             for season in $(echo "boreal_winter boreal_summer"); do
-                notice "Start to extract season \"$season\" from $flag \"$var\"."
+                notice "Start to extract season \"$season\" from $(add_color $flag 'bold') $(add_color $var 'green')."
                 mute_ncl $select_season "'dataset=\"$data\"'" \
                                         "'var=\"$var\"'" \
                                         "'season=\"$season\"'" \
