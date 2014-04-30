@@ -40,6 +40,10 @@ div.section {
 	padding-bottom: 1em;
 }
 
+div.figure {
+	text-align: center;
+}
+
 /* navigate bar */
 ul.navigate_bar {
 	list-style-type: none;
