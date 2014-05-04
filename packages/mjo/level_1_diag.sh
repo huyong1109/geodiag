@@ -20,7 +20,8 @@ function run_level_1
     calc_lag_lat "$output_directory"
     plot_lag_lat "$output_directory"
     # calculate EOF
-    #calc_eof "$output_directory"
+    #calc_univar_eof "$output_directory"
+    #plot_univar_eof "$output_directory"
 }
 
 function calc_variance
@@ -78,7 +79,7 @@ function plot_variance_ratio
     data_dir="$output_directory/data"
     figure_dir="$output_directory/figures"
     notice "Plot variance ratio."
-    mute_ncl \"$GEODIAG_PACKAGES/mjo/ncl_scripts/plot_variance_ratio.ncl\" \
+    mute_ncl \"$MJO_ROOT/ncl_scripts/plot_variance_ratio.ncl\" \
         "'data_dir=\"$data_dir\"'" \
         "'figure_dir=\"$figure_dir\"'"
 }
@@ -89,7 +90,7 @@ function plot_variance
     data_dir="$output_directory/data"
     figure_dir="$output_directory/figures"
     notice "Plot variance."
-    mute_ncl \"$GEODIAG_PACKAGES/mjo/ncl_scripts/plot_variance.ncl\" \
+    mute_ncl \"$MJO_ROOT/ncl_scripts/plot_variance.ncl\" \
         "'data_dir=\"$data_dir\"'" \
         "'figure_dir=\"$figure_dir\"'"
 }
@@ -104,7 +105,7 @@ function calc_region_mean
             for region in $(echo "west_pacific" "indian_ocean"); do
                 for flag in $(echo "unfiltered filtered"); do
                     notice "Calculate region mean of $(add_color $flag 'bold') $(add_color $var 'green') in $region at $season."
-                    mute_ncl $GEODIAG_PACKAGES/mjo/ncl_scripts/calc_region_mean.ncl \
+                    mute_ncl $MJO_ROOT/ncl_scripts/calc_region_mean.ncl \
                         "'dataset=\"$data_dir/$var.$flag.daily_anom.$season.nc\"'" \
                         "'var=\"$var\"'" \
                         "'season=\"$season\"'" \
@@ -133,7 +134,7 @@ function plot_region_mean
         for season in $(echo "boreal_winter boreal_summer"); do
             for region in $(echo "west_pacific" "indian_ocean"); do
                 for flag in $(echo "unfiltered filtered"); do
-                    mute_ncl $GEODIAG_PACKAGES/mjo/ncl_scripts/plot_region_mean.ncl \
+                    mute_ncl $MJO_ROOT/ncl_scripts/plot_region_mean.ncl \
                         "'dataset=\"$data_dir/$var.$flag.daily_anom.$season.$region.nc\"'" \
                         "'var=\"$var\"'" \
                         "'season=\"$season\"'" \
@@ -157,7 +158,7 @@ function calc_time_spectra
             for region in $(echo "west_pacific" "indian_ocean"); do
                 for flag in $(echo "unfiltered filtered"); do
                     notice "Calculate time spectra of $(add_color $flag 'bold') $(add_color $var 'green') in $region at $season."
-                    mute_ncl \"$GEODIAG_PACKAGES/mjo/ncl_scripts/calc_time_spectra.ncl\" \
+                    mute_ncl \"$MJO_ROOT/ncl_scripts/calc_time_spectra.ncl\" \
                         "'dataset=\"$data_dir/$var.$flag.daily_anom.$season.$region.nc\"'" \
                         "'var=\"$var\"'" \
                         "'output=\"$data_dir/$var.$flag.daily_anom.$season.$region.spectrum.nc\"'" &
@@ -180,7 +181,7 @@ function plot_time_spectra
     data_dir="$output_directory/data"
     figure_dir="$output_directory/figures"
     notice "Plot time spectra."
-    mute_ncl \"$GEODIAG_PACKAGES/mjo/ncl_scripts/plot_time_spectra.ncl\" \
+    mute_ncl \"$MJO_ROOT/ncl_scripts/plot_time_spectra.ncl\" \
         "'data_dir=\"$data_dir\"'" \
         "'figure_dir=\"$figure_dir\"'"
 }
@@ -195,7 +196,7 @@ function calc_lag_lon
         for season in $(echo "boreal_winter boreal_summer"); do
             for flag in $(echo "unfiltered filtered"); do
                 notice "Calculate lag-longitude of $(add_color $flag 'bold') $(add_color $var 'green') at $season."
-                mute_ncl \"$GEODIAG_PACKAGES/mjo/ncl_scripts/calc_lag_lon.ncl\" \
+                mute_ncl \"$MJO_ROOT/ncl_scripts/calc_lag_lon.ncl\" \
                     "'dataset=\"$data_dir/$var.$flag.daily_anom.$season.nc\"'" \
                     "'refer_dataset=\"$data_dir/$refer_var.$flag.daily_anom.$season.indian_ocean.nc\"'" \
                     "'var=\"$var\"'" \
@@ -219,7 +220,7 @@ function plot_lag_lon
     data_dir="$output_directory/data"
     figure_dir="$output_directory/figures"
     refer_var="OLR"
-    mute_ncl \"$GEODIAG_PACKAGES/mjo/ncl_scripts/plot_lag_lon.ncl\" \
+    mute_ncl \"$MJO_ROOT/ncl_scripts/plot_lag_lon.ncl\" \
         "'refer_var=\"$refer_var\"'" \
         "'data_dir=\"$data_dir\"'" \
         "'figure_dir=\"$figure_dir\"'"
@@ -235,7 +236,7 @@ function calc_lag_lat
         for season in $(echo "boreal_winter boreal_summer"); do
             for flag in $(echo "unfiltered filtered"); do
                 notice "Calculate lag-latitude of $(add_color $flag 'bold') $(add_color $var 'green') at $season."
-                mute_ncl \"$GEODIAG_PACKAGES/mjo/ncl_scripts/calc_lag_lat.ncl\" \
+                mute_ncl \"$MJO_ROOT/ncl_scripts/calc_lag_lat.ncl\" \
                     "'dataset=\"$data_dir/$var.$flag.daily_anom.$season.nc\"'" \
                     "'refer_dataset=\"$data_dir/$refer_var.$flag.daily_anom.$season.indian_ocean.nc\"'" \
                     "'var=\"$var\"'" \
@@ -259,23 +260,43 @@ function plot_lag_lat
     data_dir="$output_directory/data"
     figure_dir="$output_directory/figures"
     refer_var="OLR"
-    mute_ncl \"$GEODIAG_PACKAGES/mjo/ncl_scripts/plot_lag_lat.ncl\" \
+    mute_ncl \"$MJO_ROOT/ncl_scripts/plot_lag_lat.ncl\" \
         "'refer_var=\"$refer_var\"'" \
         "'data_dir=\"$data_dir\"'" \
         "'figure_dir=\"$figure_dir\"'"
 }
 
-function calc_eof
+function calc_univar_eof
 {
     output_directory=$1
     data_dir="$output_directory/data"
+    i=0
     for var in $(echo "U850 U200 OLR PRECT"); do
-        for season in $(echo "boreal_winter boreal_summer"); do
-            echo "$var $season"
-            mute_ncl \"$GEODIAG_TOOLS/statistics/calc_eof.ncl\" \
+        for season in $(echo "boreal_winter"); do
+            notice "Calculate univariate EOF of $(add_color filtered 'bold') $(add_color $var 'green') at $season."
+            mute_ncl \"$MJO_ROOT/ncl_scripts/calc_univar_eof.ncl\" \
                 "'dataset=\"$data_dir/$var.filtered.daily_anom.$season.nc\"'" \
                 "'var=\"$var\"'" \
-                "num_eof=3"
+                "num_eof=2" \
+                "'output=\"$data_dir/$var.filtered.eof.$season.nc\"'" &
+            calc_eof_pids[$i]=$!
+            i=$((i+1))
+            sleep 1
         done
     done
+    notice "The EOF compuation in NCL may be slow, so take a coffee please, if you are watching the screen!" 
+    for (( i = 0; i < ${#calc_eof_pids[@]}; ++i )); do
+        notice "Waiting job ${calc_eof_pids[$i]} ..."
+        wait ${calc_eof_pids[$i]}
+    done
+}
+
+function plot_univar_eof
+{
+    output_directory=$1
+    data_dir="$output_directory/data"
+    figure_dir="$output_directory/figures"
+    mute_ncl \"$MJO_ROOT/ncl_scripts/plot_univar_eof.ncl\" \
+        "'data_dir=\"$data_dir\"'" \
+        "'figure_dir=\"$figure_dir\"'"
 }

@@ -36,7 +36,6 @@ begin
     gsn_define_colormap(wks, colormap)
 
     res_panel = True
-    res_panel@gsnMaximize = True
 
     res_plot = True
     res_plot@gsnDraw = False
@@ -60,7 +59,7 @@ begin
     res_plot@tiYAxisString = "Lag (Day)"
     res_plot@tiYAxisFontHeightF = 0.02
     res_plot@lbTitleFuncCode = "~"
-    res_plot@lbTitleString = "IO: 75~S~o~N~-100~S~o~N~E, 10~S~o~N~S-5~S~o~N~N"
+    res_plot@lbTitleString = "Refer region: 75~S~o~N~-100~S~o~N~E, 10~S~o~N~S-5~S~o~N~N  Refer var: "+refer_var
     res_plot@lbTitleJust = "BottomLeft"
     res_plot@lbTitleFontHeightF = 0.015
     res_plot@gsnLeftString = ""
@@ -75,7 +74,6 @@ begin
     plots = new((/dimsizes(seasons)/), graphic)
 
     do i = 0, dimsizes(flags)-1
-        res_plot@tiMainString = "Lag-longitude refer to "+refer_var+" in IO ("+flags(i)+")"
         do j = 0, dimsizes(seasons)-1
             f0 = addfile(data_dir+"/OLR."+flags(i)+".daily_anom."+seasons(j)+".lag_lon.nc", "r")
             f1 = addfile(data_dir+"/U850."+flags(i)+".daily_anom."+seasons(j)+".lag_lon.nc", "r")

@@ -10,7 +10,7 @@ source $MJO_ROOT/supp_diag.sh
 
 function mjo_help
 {
-    notice "$(add_color mjo 'magenta bold') diagnosis package usage:"
+    notice "$(add_color mjo 'magenta bold') diagnositic package usage:"
     echo
     echo -e "\tgeodiag $(add_color run bold) $(add_color mjo 'magenta bold') <config file>"
     echo

@@ -38,6 +38,9 @@ function _geodiag_()
     "geodiag")
         completed_words="warmup list update help run"
         ;;
+    "run")
+        completed_words="mjo"
+        ;;
     esac
     COMPREPLY=($(compgen -W "$completed_words" -- $curr_argv))
 }

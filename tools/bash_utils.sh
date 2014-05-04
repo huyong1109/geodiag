@@ -82,6 +82,9 @@ function add_color
         if [[ $2 == *bold* ]]; then
             colored_message="$colored_message$(tput bold)"
         fi
+        if [[ $2 == *underline* ]]; then
+            colored_message="$colored_message$(tput smul)"
+        fi
         colored_message="$colored_message$1$(tput sgr0)"
         echo -n $colored_message
     fi
