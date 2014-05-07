@@ -5,3 +5,4 @@ amip
 *.o
 *.so
 build
+tools/shared

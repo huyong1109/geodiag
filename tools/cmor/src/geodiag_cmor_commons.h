@@ -7,6 +7,8 @@
 #include <list>
 #include <string>
 
+#include "geomtk/geomtk.h"
+
 namespace geodiag_cmor {
 
 using std::cout;
