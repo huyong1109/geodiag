@@ -36,9 +36,9 @@ function _geodiag_()
     completed_words=""
     case "${prev_argv##*/}" in
     "geodiag")
-        completed_words="warmup list update help run"
+        completed_words="warmup list update help run config"
         ;;
-    "run")
+    "run" | "config")
         completed_words="mjo"
         ;;
     esac

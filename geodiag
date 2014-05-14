@@ -40,7 +40,7 @@ function geodiag_help
 function check_package_validity
 {
     package=$1
-    necessary_function_suffixs="_help _run"
+    necessary_function_suffixs="_help _run _config"
     for function_suffix in $necessary_function_suffixs; do
         function=${package}${function_suffix}
         if ! type -t $function > /dev/null; then
@@ -111,6 +111,16 @@ case $1 in
         package=$2
         check_package_existence $package
         ${package}_run ${*:3}
+    fi
+    ;;
+"config")
+    if (( $# > 2 )); then
+        geodiag_help
+        report_error "Wrong usage!"
+    else
+        package=$2
+        check_package_existence $package
+        ${package}_config
     fi
     ;;
 *)

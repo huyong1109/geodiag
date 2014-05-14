@@ -5,3 +5,5 @@ amip
 *.o
 *.so
 build
+shared
+*.config

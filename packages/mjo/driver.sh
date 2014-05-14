@@ -47,3 +47,23 @@ function mjo_run
         run_supp "$output_directory"
     fi
 }
+
+function mjo_config
+{
+    config_file="mjo.config"
+    if [[ -f "$config_file" ]]; then
+        report_warning "Configuation $(add_color $config_file 'bold') exists!"
+        exit 0
+    fi
+    cat <<EOF > "$config_file"
+cmor_data_root      =   
+cmor_exp_id         =   
+cmor_data_list      =   pr rlut ua200 ua850
+internal_data_map   =   pr->PRECT rlut->OLR ua200->U200 ua850->U850
+start_date          =   19790101
+end_date            =   20081231
+output_directory    =   ./result
+diag_stages         =   all
+EOF
+    notice "Please fill in $(add_color $config_file 'bold')."
+}
